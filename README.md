@@ -47,13 +47,85 @@ The idea of different teams of developers choosing whatever ergonomic layer (+ o
 
 It is overly ambitious to try to come up with one grand unified markup / code definition that could account for every approach.  But of the many "ergonomic layers," one popular category will be those which rely on a template driven markup DSL. Examples are Polymer and Aurelia.  These template renderers will not necessarily share the same syntax.   Each may utilize its own rocket-science in terms of how to achieve the best performing results.  Wouldn't it be nice if the same component definition could be used for either?  That's what FACET is designed to help with.
 
-Specifically, FACET is a file format meant to accomplish the following goals:
+Specifically, FACETS is a file format meant to accomplish the following goals:
 
 * The generic requirement:  Be as generic as possible, adhering to syntax that will survive for years to come.  Avoid rendering specifics or playing favorites with any of the template driven frameworks.
-* Be flexible enough that as much of the unique feature set of each framework can be tapped into.
-* Leverage TypeScript to allow compile-time checks and intellisense on the templates (so no need for IDE plug-ins or IDE favorites).
-* 
-* 
+* Be flexible enough that as much of the unique feature set of each framework can be tapped into as possible.
+* Leverage TypeScript to allow compile-time checks and intellisense on the templates (no need for IDE plug-ins to understand proprietary attributes).
+
+The file format.  Here is an example of a FACETS component definition:
+```typescript
+const FlagIconTemplate = (flag_icon: FlagIcon) => `
+    <div>
+        <img src="${flag_icon.countryCodeImgUrl}" onclick="${flag_icon.CountryClickHandler}">
+    </div>
+    <div>NickNames:</div>
+    <ul>
+                                                                                                        ${flag_icon.nickNames.map(nickName =>`
+        <li>${nickName}</li>
+                                                                                                        `).join('')}                                                                        
+    </ul>
+`;
+
+class FlagIcon extends HTMLElement {
+
+    nickNames: string[];
+    
+    
+    private _countryCode: string;
+
+    private _countryCodeToImgUrlLookup: {[key: string] : string};
+    constructor() {
+        super();
+        this._countryCode = null;
+    }
+
+    get countryCodeImgUrl(){
+        return this._countryCodeToImgUrlLookup[this._countryCode]
+    }
+
+    static get observedAttributes() { return ["country"]; }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        // name will always be "country" due to observedAttributes
+        this._countryCode = newValue;
+        this._updateRendering();
+    }
+    connectedCallback() {
+        this._updateRendering();
+    }
+
+    get country() {
+        return this._countryCode;
+    }
+    set country(v) {
+        this.setAttribute("country", v);
+    }
+
+    get CountryClickHandler(){
+        return function(e){
+
+        }
+    }
+
+
+    _updateRendering() {
+        // Left as an exercise for the reader. But, you'll probably want to
+        // check this.ownerDocument.defaultView to see if we've been
+        // inserted into a document with a browsing context, and avoid
+        // doing any work if not.
+    }
+
+    
+
+}
+```
+
+
+
+
+
+
 
 
 
