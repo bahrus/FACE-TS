@@ -2,8 +2,8 @@
 
 ## What does FACETS stand for?
 
-1)  Framework Agnostic Custom Element Templates
-2)  Faces in Typescript
+1)  **F**ramework **A**gnostic **C**ustom **E**lement **T**emplates
+2)  **F**aces in **T**ypescript
 
 [The v1 Custom Element specs](https://www.w3.org/TR/custom-elements/#custom-elements-autonomous-example) provides a rudimentary example of how to create a custom element:
 
@@ -45,7 +45,7 @@ As indicated in the updateRendering method comment, there is very little indicat
 
 The idea of different teams of developers choosing whatever ergonomic layer (+ other dependencies) they desire, and to be able to have all the components working together in perfect harmony, is a big draw for the web component technology. But it comes with a cost.  If each component on a page has its own ergonomic library, that's potentially a significant amount of code overhead to just account for those different ergonomic layers.  For many of those components, the developers may be ambivalent which ergonomic layer is the best, and just want to get the job done.  If one application tends to use primarily Polymer, it would be nice if the component could utilize it if is present.  If Aurelia, the same could leverage it.  
 
-It is overly ambitious to try to come up with one grand unified markup / code definition that could account for every approach.  But of the many "ergonomic layers," one popular category will be those which rely on a template driven markup DSL. Examples are Polymer and Aurelia.  These template renderers will not necessarily share the same syntax.   Each may utilize its own rocket-science in terms of how to achieve the best performing results.  Wouldn't it be nice if the same component definition could be used for either?  That's what FACET is designed to help with.
+It is overly ambitious to try to come up with one grand unified markup / code definition that could account for every approach.  But of the many "ergonomic layers," one popular category will be those which rely on a template driven markup DSL. Examples are Polymer and Aurelia.  These template renderers will not necessarily share the same syntax.   Each may utilize its own rocket-science in terms of how to achieve the best performing results.  Wouldn't it be nice if the same component definition could be used for either?  That's what FACETS is designed to help with.
 
 Specifically, FACETS is a file format meant to accomplish the following goals:
 
