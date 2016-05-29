@@ -47,9 +47,9 @@ The idea of different teams of developers choosing whatever ergonomic layer (+ o
 
 It is overly ambitious to try to come up with one grand unified markup / code definition that could account for every approach.  But of the many "ergonomic layers," one popular category will be those which rely on a template driven markup DSL. Examples are Polymer and Aurelia.  These template renderers will not necessarily share the same syntax.   Each may utilize its own rocket-science in terms of how to achieve the best performing results.  Wouldn't it be nice if the same component definition could be used for either?  That's what FACET is designed to help with.
 
-Specifically FACET is a file format meant to accomplish the following goals:
+Specifically, FACET is a file format meant to accomplish the following goals:
 
-* The Generic requirement:  Be as generic as possible, adhering to syntax that will survive for years to come.  Avoid rendering specifics or playing favorites with any of the template driven frameworks.
+* The generic requirement:  Be as generic as possible, adhering to syntax that will survive for years to come.  Avoid rendering specifics or playing favorites with any of the template driven frameworks.
 * Be flexible enough that as much of the unique feature set of each framework can be tapped into.
 * Leverage TypeScript to allow compile-time checks and intellisense on the templates (so no need for IDE plug-ins or IDE favorites).
 * 
