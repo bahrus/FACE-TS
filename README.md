@@ -57,7 +57,8 @@ The file format.  Here is an example of a FACETS component definition:
 ```typescript
 const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
-        <img src="${flag_icon.countryCodeImgUrl}" onclick="${flag_icon.CountryClickHandler}">
+        <img src="${flag_icon.countryCodeImgUrl}" 
+        onclick="${flag_icon.CountryClickHandler}">
     </div>
     <div>NickNames:</div>
     <ul>
