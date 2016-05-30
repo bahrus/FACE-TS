@@ -62,9 +62,9 @@ const FlagIconTemplate = (flag_icon: FlagIcon) => `
     </div>
     <div>NickNames:</div>
     <ul>
-                                                                                              ${flag_icon.nickNames.map(nickName =>`
+                                                                                    ${flag_icon.nickNames.map(nickName =>`
         <li>${nickName}</li>
-                                                                                              `).join('')}                                                                        
+                                                                                    `).join('')}                                                                        
     </ul>
 `;
 
