@@ -1,0 +1,121 @@
+{
+    "type": "Program",
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "ArrowFunctionExpression",
+                "params": [
+                    {
+                        "type": "Identifier",
+                        "name": "flag_icon"
+                    }
+                ],
+                "body": {
+                    "type": "TemplateLiteral",
+                    "quasis": [
+                        {
+                            "type": "TemplateElement",
+                            "tail": false,
+                            "value": {
+                                "cooked": "\n<div>\n<img src=\"${flag_icon.countryCodeImgUrl}\" \nonclick=\"${flag_icon.CountryClickHandler}\">\n</div>\n<div>NickNames:</div>\n<ul>\n",
+                                "raw": "\n<div>\n<img src=\"${flag_icon.countryCodeImgUrl}\" \nonclick=\"${flag_icon.CountryClickHandler}\">\n</div>\n<div>NickNames:</div>\n<ul>\n"
+                            }
+                        },
+                        {
+                            "type": "TemplateElement",
+                            "tail": true,
+                            "value": {
+                                "cooked": " \n</ul>\n",
+                                "raw": " \n</ul>\n"
+                            }
+                        }
+                    ],
+                    "expressions": [
+                        {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "MemberExpression",
+                                "computed": false,
+                                "object": {
+                                    "type": "CallExpression",
+                                    "callee": {
+                                        "type": "MemberExpression",
+                                        "computed": false,
+                                        "object": {
+                                            "type": "MemberExpression",
+                                            "computed": false,
+                                            "object": {
+                                                "type": "Identifier",
+                                                "name": "flag_icon"
+                                            },
+                                            "property": {
+                                                "type": "Identifier",
+                                                "name": "nickNames"
+                                            }
+                                        },
+                                        "property": {
+                                            "type": "Identifier",
+                                            "name": "map"
+                                        }
+                                    },
+                                    "arguments": [
+                                        {
+                                            "type": "ArrowFunctionExpression",
+                                            "params": [
+                                                {
+                                                    "type": "Identifier",
+                                                    "name": "nickName"
+                                                }
+                                            ],
+                                            "body": {
+                                                "type": "TemplateLiteral",
+                                                "quasis": [
+                                                    {
+                                                        "type": "TemplateElement",
+                                                        "tail": false,
+                                                        "value": {
+                                                            "cooked": "\n<li>",
+                                                            "raw": "\n<li>"
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "TemplateElement",
+                                                        "tail": true,
+                                                        "value": {
+                                                            "cooked": "</li>\n",
+                                                            "raw": "</li>\n"
+                                                        }
+                                                    }
+                                                ],
+                                                "expressions": [
+                                                    {
+                                                        "type": "Identifier",
+                                                        "name": "nickName"
+                                                    }
+                                                ]
+                                            },
+                                            "expression": true
+                                        }
+                                    ]
+                                },
+                                "property": {
+                                    "type": "Identifier",
+                                    "name": "join"
+                                }
+                            },
+                            "arguments": [
+                                {
+                                    "type": "Literal",
+                                    "value": "",
+                                    "raw": "''"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "expression": true
+            }
+        }
+    ]
+}
