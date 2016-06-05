@@ -7,7 +7,7 @@ export const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>NickNames:</div>
     <ul>
                                                         ${flag_icon.nickNames.map(nickName =>`
-        <li>${nickName}</li>
+        <li>NickName: ${nickName}</li>
                                                         `).join('')}                                                                        
     </ul>
 `;

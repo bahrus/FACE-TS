@@ -7,7 +7,7 @@ exports.FlagIconTemplate = (flag_icon) => `
     <div>NickNames:</div>
     <ul>
                                                         ${flag_icon.nickNames.map(nickName => `
-        <li>${nickName}</li>
+        <li>NickName: ${nickName}</li>
                                                         `).join('')}                                                                        
     </ul>
 `;
