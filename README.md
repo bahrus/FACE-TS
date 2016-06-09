@@ -110,12 +110,7 @@ class FlagIcon extends HTMLElement {
     }
 
 
-    _updateRendering() {
-        // Left as an exercise for the reader. But, you'll probably want to
-        // check this.ownerDocument.defaultView to see if we've been
-        // inserted into a document with a browsing context, and avoid
-        // doing any work if not.
-    }
+    
 
     
 
