@@ -9,6 +9,11 @@ const filePath = './Tests/FlagIcon';
 //import flagIcon = require(filePath);
 import flagIcon = require('./Tests/FlagIcon');
 
+export interface IPair{
+    lhs: string;
+    rhs: string;
+}
+
 //var flagIcon = require(filePath);
 const templateFnString = flagIcon.FlagIconTemplate.toString();
 const templateHTML = `
@@ -23,6 +28,22 @@ console.log($.html());
 //const parsed = esprima.parse(templateFnString);
 //console.log(esprima.parse);
 
+function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair){
+    if(nodeElement.type==='text'){
+        populateTextNode(nodeElement, templateTokenPair);
+    }else{
+        populateAttributes(nodeElement, templateTokenPair);
+    }
+    const children = nodeElement.children;
+    if(!children) return;
+    for(let i = 0, ii = children.length; i < ii; i++){
+        const child = children[i];
+        console.log(child.type);
+        
+        parseNodeElement(child, templateTokenPair);
+    }
+}
+
 function parseNode($node:  Cheerio){
     const templateTokenPair: IPair = {
         lhs: '${',
@@ -35,6 +56,47 @@ function parseNode($node:  Cheerio){
     }
     
     
+}
+
+function splitPairs(text: string, pair: IPair): string[]{
+    const returnObj: string[] = [];
+    let region: string[] = [];
+    const lhsFirstChr = pair.lhs.substr(0, 1);
+    const rhsFirstChr = pair.rhs.substr(0, 1);
+    const lhsLength = pair.lhs.length;
+    const rhsLength = pair.rhs.length;
+    for(let i = 0, ii = text.length; i < ii; i++){
+        const chr = text[i];
+        let foundLHSMatch: boolean;
+        let foundRHSMatch: boolean;
+        if(chr === lhsFirstChr){
+            if(text.substr(i, lhsLength) === pair.lhs){
+                foundLHSMatch = true;
+            }
+        }
+        if(chr === rhsFirstChr){
+            if(text.substr(i, rhsLength) === pair.rhs){
+                foundRHSMatch = true;
+            }
+        }
+        if(foundLHSMatch || foundRHSMatch){
+            if(region.length > 0) {
+                returnObj.push(region.join(''));
+                region = [];
+            }
+            returnObj.push(foundLHSMatch ? pair.lhs : pair.rhs );
+            
+            i += (foundLHSMatch ? lhsLength: rhsLength);
+        }else{
+            region.push(chr);
+        }
+        
+
+    }
+    if(region.length > 0){
+        returnObj.push(region.join(''));
+    }
+    return returnObj;
 }
 
 function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPair){
@@ -92,72 +154,17 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
                     splitPair[i + 1] = val;
                 }
                 splitPair[i + 2] = '}}';
-      
+            }
         }
 
         
     }
 }
 
-function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair){
-    if(nodeElement.type==='text'){
-        populateTextNode(nodeElement, templateTokenPair);
-    }else{
-        populateAttributes(nodeElement, templateTokenPair);
-    }
-    const children = nodeElement.children;
-    if(!children) return;
-    for(let i = 0, ii = children.length; i < ii; i++){
-        const child = children[i];
-        console.log(child.type);
-        
-        parseNodeElement(child, templateTokenPair);
-    }
-}
 
-export interface IPair{
-    lhs: string;
-    rhs: string;
-}
 
-function splitPairs(text: string, pair: IPair): string[]{
-    const returnObj: string[] = [];
-    let region: string[] = [];
-    const lhsFirstChr = pair.lhs.substr(0, 1);
-    const rhsFirstChr = pair.rhs.substr(0, 1);
-    const lhsLength = pair.lhs.length;
-    const rhsLength = pair.rhs.length;
-    for(let i = 0, ii = text.length; i < ii; i++){
-        const chr = text[i];
-        let foundLHSMatch: boolean;
-        let foundRHSMatch: boolean;
-        if(chr === lhsFirstChr){
-            if(text.substr(i, lhsLength) === pair.lhs){
-                foundLHSMatch = true;
-            }
-        }
-        if(chr === rhsFirstChr){
-            if(text.substr(i, rhsLength) === pair.rhs){
-                foundRHSMatch = true;
-            }
-        }
-        if(foundLHSMatch || foundRHSMatch){
-            if(region.length > 0) {
-                returnObj.push(region.join(''));
-                region = [];
-            }
-            returnObj.push(foundLHSMatch ? pair.lhs : pair.rhs );
-            
-            i += (foundLHSMatch ? lhsLength: rhsLength);
-        }else{
-            region.push(chr);
-        }
-        
 
-    }
-    if(region.length > 0){
-        returnObj.push(region.join(''));
-    }
-    return returnObj;
-}
+
+
+
 

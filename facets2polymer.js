@@ -1,9 +1,9 @@
 "use strict";
 var esprima = require('esprima');
-var cheerio = require('cheerio');
+const cheerio = require('cheerio');
 const filePath = './Tests/FlagIcon';
 //import flagIcon = require(filePath);
-var flagIcon = require('./Tests/FlagIcon');
+const flagIcon = require('./Tests/FlagIcon');
 //var flagIcon = require(filePath);
 const templateFnString = flagIcon.FlagIconTemplate.toString();
 const templateHTML = `
@@ -16,51 +16,12 @@ parseNode($.root());
 console.log($.html());
 //const parsed = esprima.parse(templateFnString);
 //console.log(esprima.parse);
-function parseNode($node) {
-    const templateTokenPair = {
-        lhs: '${',
-        rhs: '}'
-    };
-    for (let i = 0, ii = $node.length; i < ii; i++) {
-        const node = $node[i];
-        parseNodeElement(node, templateTokenPair);
-    }
-}
 function parseNodeElement(nodeElement, templateTokenPair) {
     if (nodeElement.type === 'text') {
+        populateTextNode(nodeElement, templateTokenPair);
     }
-    const attribs = nodeElement.attribs;
-    if (attribs) {
-        for (let key in attribs) {
-            let val = attribs[key];
-            const splitPair = splitPairs(val, templateTokenPair);
-            if (splitPair.length > 1) {
-                //const newValTokens = [];
-                const isEventHandler = key.startsWith('on');
-                for (let i = 0, ii = splitPair.length; i < ii; i++) {
-                    const token = splitPair[i];
-                    if (token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs) {
-                        splitPair[i] = isEventHandler ? '' : '{{';
-                        let val2 = splitPair[i + 1];
-                        const posOfDot = val2.indexOf('.');
-                        if (posOfDot > -1) {
-                            val2 = val2.substr(posOfDot + 1);
-                            splitPair[i + 1] = val2;
-                        }
-                        splitPair[i + 2] = isEventHandler ? '' : '}}';
-                    }
-                }
-                let newKey;
-                if (isEventHandler) {
-                    newKey = 'on-' + key.substr(2);
-                }
-                else {
-                    newKey = key + '$';
-                }
-                attribs[newKey] = splitPair.join('');
-                delete attribs[key];
-            }
-        }
+    else {
+        populateAttributes(nodeElement, templateTokenPair);
     }
     const children = nodeElement.children;
     if (!children)
@@ -69,6 +30,16 @@ function parseNodeElement(nodeElement, templateTokenPair) {
         const child = children[i];
         console.log(child.type);
         parseNodeElement(child, templateTokenPair);
+    }
+}
+function parseNode($node) {
+    const templateTokenPair = {
+        lhs: '${',
+        rhs: '}'
+    };
+    for (let i = 0, ii = $node.length; i < ii; i++) {
+        const node = $node[i];
+        parseNodeElement(node, templateTokenPair);
     }
 }
 function splitPairs(text, pair) {
@@ -108,5 +79,63 @@ function splitPairs(text, pair) {
         returnObj.push(region.join(''));
     }
     return returnObj;
+}
+function populateAttributes(nodeElement, templateTokenPair) {
+    const attribs = nodeElement.attribs;
+    if (attribs) {
+        for (let key in attribs) {
+            let val = attribs[key];
+            const splitPair = splitPairs(val, templateTokenPair);
+            if (splitPair.length > 1) {
+                //const newValTokens = [];
+                const isEventHandler = key.startsWith('on');
+                for (let i = 0, ii = splitPair.length; i < ii; i++) {
+                    const token = splitPair[i];
+                    if (token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs) {
+                        splitPair[i] = isEventHandler ? '' : '{{';
+                        let val2 = splitPair[i + 1];
+                        const posOfDot = val2.indexOf('.');
+                        if (posOfDot > -1) {
+                            val2 = val2.substr(posOfDot + 1);
+                            splitPair[i + 1] = val2;
+                        }
+                        splitPair[i + 2] = isEventHandler ? '' : '}}';
+                    }
+                }
+                let newKey;
+                if (isEventHandler) {
+                    newKey = 'on-' + key.substr(2);
+                }
+                else {
+                    newKey = key + '$';
+                }
+                attribs[newKey] = splitPair.join('');
+                delete attribs[key];
+            }
+        }
+    }
+}
+function populateTextNode(nodeElement, templateTokenPair) {
+    const parent = nodeElement.parent;
+    if (parent.children.length !== 1)
+        return;
+    const $parent = $(parent);
+    const innerText = $parent.text();
+    const splitPair = splitPairs(innerText, templateTokenPair);
+    if (splitPair.length > 1) {
+        for (let i = 0, ii = splitPair.length; i < ii; i++) {
+            const token = splitPair[i];
+            if (token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs) {
+                splitPair[i] = '{{';
+                let val = splitPair[i + 1];
+                const posOfDot = val.indexOf('.');
+                if (posOfDot > -1) {
+                    val = val.substr(posOfDot + 1);
+                    splitPair[i + 1] = val;
+                }
+                splitPair[i + 2] = '}}';
+            }
+        }
+    }
 }
 //# sourceMappingURL=facets2polymer.js.map
