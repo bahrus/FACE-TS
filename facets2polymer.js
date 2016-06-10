@@ -16,9 +16,9 @@ parseNode($.root());
 console.log($.html());
 //const parsed = esprima.parse(templateFnString);
 //console.log(esprima.parse);
-function parseNodeElement(nodeElement, templateTokenPair) {
+function parseNodeElement(nodeElement, templateTokenPair, parent) {
     if (nodeElement.type === 'text') {
-        populateTextNode(nodeElement, templateTokenPair);
+        populateTextNode(nodeElement, templateTokenPair, parent);
     }
     else {
         populateAttributes(nodeElement, templateTokenPair);
@@ -28,8 +28,7 @@ function parseNodeElement(nodeElement, templateTokenPair) {
         return;
     for (let i = 0, ii = children.length; i < ii; i++) {
         const child = children[i];
-        console.log(child.type);
-        parseNodeElement(child, templateTokenPair);
+        parseNodeElement(child, templateTokenPair, nodeElement);
     }
 }
 function parseNode($node) {
@@ -39,7 +38,7 @@ function parseNode($node) {
     };
     for (let i = 0, ii = $node.length; i < ii; i++) {
         const node = $node[i];
-        parseNodeElement(node, templateTokenPair);
+        parseNodeElement(node, templateTokenPair, null);
     }
 }
 function splitPairs(text, pair) {
@@ -115,8 +114,7 @@ function populateAttributes(nodeElement, templateTokenPair) {
         }
     }
 }
-function populateTextNode(nodeElement, templateTokenPair) {
-    const parent = nodeElement.parent;
+function populateTextNode(nodeElement, templateTokenPair, parent) {
     if (parent.children.length !== 1)
         return;
     const $parent = $(parent);

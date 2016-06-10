@@ -28,9 +28,9 @@ console.log($.html());
 //const parsed = esprima.parse(templateFnString);
 //console.log(esprima.parse);
 
-function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair){
+function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
     if(nodeElement.type==='text'){
-        populateTextNode(nodeElement, templateTokenPair);
+        populateTextNode(nodeElement, templateTokenPair, parent);
     }else{
         populateAttributes(nodeElement, templateTokenPair);
     }
@@ -38,9 +38,7 @@ function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair
     if(!children) return;
     for(let i = 0, ii = children.length; i < ii; i++){
         const child = children[i];
-        console.log(child.type);
-        
-        parseNodeElement(child, templateTokenPair);
+        parseNodeElement(child, templateTokenPair, nodeElement);
     }
 }
 
@@ -51,8 +49,7 @@ function parseNode($node:  Cheerio){
     };
     for(let i = 0, ii = $node.length; i< ii; i++){
         const node = $node[i];
-        parseNodeElement(node, templateTokenPair);
-        
+        parseNodeElement(node, templateTokenPair, null)       
     }
     
     
@@ -136,8 +133,7 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
 
 }
 
-function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair){
-    const parent = nodeElement.parent;
+function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
     if(parent.children.length !== 1) return;
     const $parent = $(parent);
     const innerText = $parent.text();
