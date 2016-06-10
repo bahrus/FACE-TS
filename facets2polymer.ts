@@ -83,7 +83,7 @@ function splitPairs(text: string, pair: IPair): string[]{
             }
             returnObj.push(foundLHSMatch ? pair.lhs : pair.rhs );
             
-            i += (foundLHSMatch ? lhsLength: rhsLength);
+            i += (foundLHSMatch ? lhsLength: rhsLength) - 1;
         }else{
             region.push(chr);
         }
@@ -152,7 +152,7 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
                 splitPair[i + 2] = '}}';
             }
         }
-
+        $parent.text(splitPair.join(''));
         
     }
 }

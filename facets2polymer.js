@@ -1,9 +1,9 @@
 "use strict";
 var esprima = require('esprima');
-const cheerio = require('cheerio');
+var cheerio = require('cheerio');
 const filePath = './Tests/FlagIcon';
 //import flagIcon = require(filePath);
-const flagIcon = require('./Tests/FlagIcon');
+var flagIcon = require('./Tests/FlagIcon');
 //var flagIcon = require(filePath);
 const templateFnString = flagIcon.FlagIconTemplate.toString();
 const templateHTML = `
@@ -68,7 +68,7 @@ function splitPairs(text, pair) {
                 region = [];
             }
             returnObj.push(foundLHSMatch ? pair.lhs : pair.rhs);
-            i += (foundLHSMatch ? lhsLength : rhsLength);
+            i += (foundLHSMatch ? lhsLength : rhsLength) - 1;
         }
         else {
             region.push(chr);
@@ -134,6 +134,7 @@ function populateTextNode(nodeElement, templateTokenPair, parent) {
                 splitPair[i + 2] = '}}';
             }
         }
+        $parent.text(splitPair.join(''));
     }
 }
 //# sourceMappingURL=facets2polymer.js.map
