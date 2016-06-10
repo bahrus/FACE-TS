@@ -172,7 +172,11 @@ And likewise the aurelia processor would output:
 <div some-other-property="goodbye"></div>
 ```
 
-
+Likewise with properties / methods of a class.  If a method called polymer_doSomething 
+and another method aurelia_doSomething is defined, both the polymer and aurelia target
+transpiled will have one implementation of a method called doSomething.  The transpiler
+will also erase any plaeholder method called doSomething, which would be there in order for
+references to be made, ina 
 
 
 
