@@ -37,10 +37,7 @@ function parseNode($node:  Cheerio){
     
 }
 
-function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair){
-    if(nodeElement.type==='text'){
-        //console.log
-    }
+function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPair){
     const attribs = nodeElement.attribs;
     if(attribs){
         for(let key in attribs){
@@ -71,23 +68,17 @@ function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair
                 attribs[newKey] = splitPair.join('');
                 delete attribs[key];
             }
-            // console.log(splitPair);
-            // if(val.startsWith('${') && val.endsWith('}')){
-            //     val =  val.substr(2, val.length - 3);
-            //     const posOfDot = val.indexOf('.');
-            //     if(posOfDot > -1){
-            //         val = val.substr(posOfDot + 1);
-            //     }
-            //     let newKey: string;
-            //     if(key.startsWith('on')){
-            //         newKey = 'on-' + key.substr(2);
-            //     }else{
-            //         newKey = key + '$';
-            //     }
-            //     attribs[newKey] = val;
-            //     delete attribs[key]
-            // }
+            
         }
+    }
+
+}
+
+function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair){
+    if(nodeElement.type==='text'){
+        //console.log
+    }else{
+        populateAttributes(nodeElement, templateTokenPair);
     }
     const children = nodeElement.children;
     if(!children) return;
