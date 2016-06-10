@@ -74,9 +74,34 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
 
 }
 
+function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair){
+    const parent = nodeElement.parent;
+    if(parent.children.length !== 1) return;
+    const $parent = $(parent);
+    const innerText = $parent.text();
+    const splitPair = splitPairs(innerText, templateTokenPair);
+    if(splitPair.length > 1){
+        for(let i=0, ii = splitPair.length; i < ii; i++){
+            const token = splitPair[i];
+            if(token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs){
+                splitPair[i] = '{{';
+                let val = splitPair[i + 1];
+                const posOfDot = val.indexOf('.');
+                if(posOfDot > -1){
+                    val = val.substr(posOfDot + 1);
+                    splitPair[i + 1] = val;
+                }
+                splitPair[i + 2] = '}}';
+      
+        }
+
+        
+    }
+}
+
 function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair){
     if(nodeElement.type==='text'){
-        //console.log
+        populateTextNode(nodeElement, templateTokenPair);
     }else{
         populateAttributes(nodeElement, templateTokenPair);
     }
