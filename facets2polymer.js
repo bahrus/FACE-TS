@@ -6,14 +6,19 @@ const filePath = './Tests/FlagIcon';
 var flagIcon = require('./Tests/FlagIcon');
 //var flagIcon = require(filePath);
 const templateFnString = flagIcon.FlagIconTemplate.toString();
-const templateHTML = `
-    <template>
+const templateHTML = `<template>
     ${templateFnString}
-    </template>
-`;
+</template>`;
 const $ = cheerio.load(templateHTML);
 parseNode($.root());
-console.log($.html());
+let tokensEvaluated = $.root().html();
+tokensEvaluated = tokensEvaluated.substr('<template>'.length);
+tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
+const arrowFunction = /=&gt;/g;
+tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
+const joinAposApos = /&apos;&apos;/g;
+tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
+console.log(tokensEvaluated);
 //const parsed = esprima.parse(templateFnString);
 //console.log(esprima.parse);
 function parseNodeElement(nodeElement, templateTokenPair, parent) {
