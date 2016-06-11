@@ -19,8 +19,8 @@ tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
 const joinAposApos = /&apos;&apos;/g;
 tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
 console.log(tokensEvaluated);
-//const parsed = esprima.parse(templateFnString);
-//console.log(esprima.parse);
+const parsed = esprima.parse(tokensEvaluated);
+console.log(parsed);
 function parseNodeElement(nodeElement, templateTokenPair, parent) {
     if (nodeElement.type === 'text') {
         populateTextNode(nodeElement, templateTokenPair, parent);
@@ -120,8 +120,19 @@ function populateAttributes(nodeElement, templateTokenPair) {
     }
 }
 function populateTextNode(nodeElement, templateTokenPair, parent) {
-    if (parent.children.length !== 1)
+    if (parent.children.length !== 1) {
+        const text = nodeElement['data'];
+        const lines = text.split('\n');
+        for (let i = 0, ii = lines.length; i < ii; i++) {
+            const line = lines[i].trim();
+            if (line.startsWith('${')) {
+                console.log(line);
+                console.log(nodeElement.next);
+            }
+        }
+        //console.log(lines);
         return;
+    }
     const $parent = $(parent);
     const innerText = $parent.text();
     const splitPair = splitPairs(innerText, templateTokenPair);

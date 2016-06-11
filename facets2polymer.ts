@@ -32,8 +32,8 @@ tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
 
 console.log(tokensEvaluated);
 
-//const parsed = esprima.parse(templateFnString);
-//console.log(esprima.parse);
+const parsed = esprima.parse(tokensEvaluated);
+console.log(parsed);
 
 function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
     if(nodeElement.type==='text'){
@@ -141,7 +141,19 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
 }
 
 function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
-    if(parent.children.length !== 1) return;
+    if(parent.children.length !== 1) {
+        const text = nodeElement['data'] as string;
+        const lines = text.split('\n');
+        for(let i = 0, ii = lines.length; i < ii; i++){
+            const line = lines[i].trim();
+            if(line.startsWith('${')){
+                console.log(line);
+                console.log(nodeElement.next);
+            }
+        }
+        //console.log(lines);
+        return;
+    }
     const $parent = $(parent);
     const innerText = $parent.text();
     const splitPair = splitPairs(innerText, templateTokenPair);
