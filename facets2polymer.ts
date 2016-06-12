@@ -22,6 +22,7 @@ const templateHTML = `<template>
 const $ = cheerio.load(templateHTML);
 parseNode($.root());
 let tokensEvaluated = $.root().html();
+//debugger;
 tokensEvaluated = tokensEvaluated.substr('<template>'.length);
 tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
 const arrowFunction = /=&gt;/g;
@@ -32,8 +33,8 @@ tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
 
 console.log(tokensEvaluated);
 
-const parsed = esprima.parse(tokensEvaluated);
-console.log(parsed);
+// const parsed = esprima.parse(tokensEvaluated);
+// console.log(parsed);
 
 function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
     if(nodeElement.type==='text'){
@@ -144,16 +145,42 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
     if(parent.children.length !== 1) {
         const text = nodeElement['data'] as string;
         const lines = text.split('\n');
+        const $nodeElement = $(nodeElement);
+        const $parent = $(parent);
         for(let i = 0, ii = lines.length; i < ii; i++){
             const line = lines[i].trim();
             if(line.startsWith('${')){
                 console.log(line);
-                console.log(nodeElement.next);
+                const iPosOfMap = line.indexOf('.map(');
+                let itemsPointer = line.substr(0, iPosOfMap).substr(2);
+                const iPosOfDot = itemsPointer.indexOf('.');
+                if(iPosOfDot > -1){
+                    itemsPointer = itemsPointer.substr(iPosOfDot + 1);
+                }
+                //const $newElement = $nodeElement.after();
+                //debugger;
+                //const $newElement = $(parent).append(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
+                const $newElement = $nodeElement.before(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
+                $nodeElement.remove();
+                // let $nextElement = $newElement.next();
+                // while($nextElement){
+                //     if($nextElement.text().indexOf("`).join('')}") > -1){
+                //         $nextElement.remove();
+                //         $nextElement = null;
+                //     }else{
+                //         $newElement.append($nextElement);
+                //         $nextElement.remove();
+                //         $nextElement = $newElement.next();
+                //     }
+                // }
+                //$nodeElement.remove();
+                //console.log(nodeElement.next);
             }
         }
         //console.log(lines);
         return;
     }
+    //parent.children.length === 1 below -- check for string interpolation
     const $parent = $(parent);
     const innerText = $parent.text();
     const splitPair = splitPairs(innerText, templateTokenPair);
@@ -174,6 +201,7 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
         $parent.text(splitPair.join(''));
         
     }
+    
 }
 
 

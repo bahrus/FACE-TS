@@ -12,6 +12,7 @@ const templateHTML = `<template>
 const $ = cheerio.load(templateHTML);
 parseNode($.root());
 let tokensEvaluated = $.root().html();
+//debugger;
 tokensEvaluated = tokensEvaluated.substr('<template>'.length);
 tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
 const arrowFunction = /=&gt;/g;
@@ -19,8 +20,8 @@ tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
 const joinAposApos = /&apos;&apos;/g;
 tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
 console.log(tokensEvaluated);
-const parsed = esprima.parse(tokensEvaluated);
-console.log(parsed);
+// const parsed = esprima.parse(tokensEvaluated);
+// console.log(parsed);
 function parseNodeElement(nodeElement, templateTokenPair, parent) {
     if (nodeElement.type === 'text') {
         populateTextNode(nodeElement, templateTokenPair, parent);
@@ -123,16 +124,29 @@ function populateTextNode(nodeElement, templateTokenPair, parent) {
     if (parent.children.length !== 1) {
         const text = nodeElement['data'];
         const lines = text.split('\n');
+        const $nodeElement = $(nodeElement);
+        const $parent = $(parent);
         for (let i = 0, ii = lines.length; i < ii; i++) {
             const line = lines[i].trim();
             if (line.startsWith('${')) {
                 console.log(line);
-                console.log(nodeElement.next);
+                const iPosOfMap = line.indexOf('.map(');
+                let itemsPointer = line.substr(0, iPosOfMap).substr(2);
+                const iPosOfDot = itemsPointer.indexOf('.');
+                if (iPosOfDot > -1) {
+                    itemsPointer = itemsPointer.substr(iPosOfDot + 1);
+                }
+                //const $newElement = $nodeElement.after();
+                //debugger;
+                //const $newElement = $(parent).append(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
+                const $newElement = $nodeElement.before(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
+                $nodeElement.remove();
             }
         }
         //console.log(lines);
         return;
     }
+    //parent.children.length === 1 below -- check for string interpolation
     const $parent = $(parent);
     const innerText = $parent.text();
     const splitPair = splitPairs(innerText, templateTokenPair);
