@@ -37,6 +37,7 @@ console.log(tokensEvaluated);
 // console.log(parsed);
 
 function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
+    if(!nodeElement) return;
     if(nodeElement.type==='text'){
         populateTextNode(nodeElement, templateTokenPair, parent);
     }else{
@@ -160,20 +161,31 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
                 //const $newElement = $nodeElement.after();
                 //debugger;
                 //const $newElement = $(parent).append(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
-                const $newElement = $nodeElement.before(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
+                
+                const nextElements: CheerioElement[] = [];
+                let nextElement = nodeElement.next;
+                while(nextElement){
+                    if(nextElement.type === 'text' && nodeElement['data'].indexOf("`).join('')}") > -1){
+                        
+                        nextElement = null;
+                    }else{
+                        nextElements.push(nextElement);
+                        nextElement = nextElement.next;
+                    }
+                }
+                $nodeElement.before(`<template is="dom-repeat" items="{{${itemsPointer}}}"></template>`);
+                //debugger;
+                const $newElement = $(nodeElement.prev);
                 $nodeElement.remove();
-                // let $nextElement = $newElement.next();
-                // while($nextElement){
-                //     if($nextElement.text().indexOf("`).join('')}") > -1){
-                //         $nextElement.remove();
-                //         $nextElement = null;
-                //     }else{
-                //         $newElement.append($nextElement);
-                //         $nextElement.remove();
-                //         $nextElement = $newElement.next();
-                //     }
-                // }
-                //$nodeElement.remove();
+               // const itemsToRemove: Cheerio[] = [$nodeElement];
+               //debugger;
+                for(let j = 0, jj = nextElements.length; j < jj; j++){
+                    const $nextElement = $(nextElements[j]);
+                    $newElement[0].children.push($nextElement[0]);
+                    //$newElement.append($nextElement);
+                    $nextElement.remove();
+                }
+                
                 //console.log(nodeElement.next);
             }
         }
