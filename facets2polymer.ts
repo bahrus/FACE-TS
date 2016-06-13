@@ -165,9 +165,10 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
                 const nextElements: CheerioElement[] = [];
                 let nextElement = nodeElement.next;
                 while(nextElement){
-                    if(nextElement.type === 'text' && nodeElement['data'].indexOf("`).join('')}") > -1){
-                        
+                    if(nextElement.type === 'text' && nextElement['data'].indexOf("`).join('')}") > -1){
+                        $(nextElement).remove();
                         nextElement = null;
+                        
                     }else{
                         nextElements.push(nextElement);
                         nextElement = nextElement.next;

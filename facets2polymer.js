@@ -144,7 +144,8 @@ function populateTextNode(nodeElement, templateTokenPair, parent) {
                 const nextElements = [];
                 let nextElement = nodeElement.next;
                 while (nextElement) {
-                    if (nextElement.type === 'text' && nodeElement['data'].indexOf("`).join('')}") > -1) {
+                    if (nextElement.type === 'text' && nextElement['data'].indexOf("`).join('')}") > -1) {
+                        $(nextElement).remove();
                         nextElement = null;
                     }
                     else {
