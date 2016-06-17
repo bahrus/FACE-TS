@@ -19,9 +19,18 @@ const arrowFunction = /=&gt;/g;
 tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
 const joinAposApos = /&apos;&apos;/g;
 tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
+tokensEvaluated = trimOutside(tokensEvaluated, '`');
 console.log(tokensEvaluated);
 // const parsed = esprima.parse(tokensEvaluated);
-// console.log(parsed);
+function trimOutside(s, start, end) {
+    if (!end)
+        end = start;
+    const iPosOfStart = s.indexOf(start);
+    const iPosOfEnd = s.lastIndexOf(end);
+    if (iPosOfEnd === -1)
+        return s.substr(iPosOfStart + start.length);
+    return s.substring(iPosOfStart + start.length, iPosOfEnd);
+}
 function parseNodeElement(nodeElement, templateTokenPair, parent) {
     if (!nodeElement)
         return;
@@ -131,7 +140,6 @@ function populateTextNode(nodeElement, templateTokenPair, parent) {
         for (let i = 0, ii = lines.length; i < ii; i++) {
             const line = lines[i].trim();
             if (line.startsWith('${')) {
-                console.log(line);
                 const iPosOfMap = line.indexOf('.map(');
                 let itemsPointer = line.substr(0, iPosOfMap).substr(2);
                 const iPosOfDot = itemsPointer.indexOf('.');
@@ -167,7 +175,6 @@ function populateTextNode(nodeElement, templateTokenPair, parent) {
                 }
             }
         }
-        //console.log(lines);
         return;
     }
     //parent.children.length === 1 below -- check for string interpolation

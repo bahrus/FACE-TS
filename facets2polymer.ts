@@ -29,13 +29,19 @@ const arrowFunction = /=&gt;/g;
 tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
 const joinAposApos = /&apos;&apos;/g;
 tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
-
+tokensEvaluated = trimOutside(tokensEvaluated, '`');
 
 console.log(tokensEvaluated);
 
 // const parsed = esprima.parse(tokensEvaluated);
-// console.log(parsed);
 
+function trimOutside(s: string, start: string, end?: string) : string {
+    if(!end) end = start;
+    const iPosOfStart = s.indexOf(start);
+    const iPosOfEnd = s.lastIndexOf(end);
+    if(iPosOfEnd === -1) return s.substr(iPosOfStart + start.length);
+    return s.substring(iPosOfStart + start.length, iPosOfEnd);
+}
 function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
     if(!nodeElement) return;
     if(nodeElement.type==='text'){
@@ -151,7 +157,6 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
         for(let i = 0, ii = lines.length; i < ii; i++){
             const line = lines[i].trim();
             if(line.startsWith('${')){
-                console.log(line);
                 const iPosOfMap = line.indexOf('.map(');
                 let itemsPointer = line.substr(0, iPosOfMap).substr(2);
                 const iPosOfDot = itemsPointer.indexOf('.');
@@ -187,10 +192,8 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
                     $nextElement.remove();
                 }
                 
-                //console.log(nodeElement.next);
             }
         }
-        //console.log(lines);
         return;
     }
     //parent.children.length === 1 below -- check for string interpolation
