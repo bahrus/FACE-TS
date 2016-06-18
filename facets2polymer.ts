@@ -1,13 +1,14 @@
 "use strict"
 
 declare var require;
-var esprima = require('esprima');
+const esprima = require('esprima');
 import cheerio = require('cheerio');
+const path = require('path');
 const filePath = './Tests/FlagIcon';
 
 
 //import flagIcon = require(filePath);
-import flagIcon = require('./Tests/FlagIcon');
+//import flagIcon = require('./Tests/FlagIcon');
 
 export interface IPair{
     lhs: string;
@@ -15,23 +16,31 @@ export interface IPair{
 }
 
 //var flagIcon = require(filePath);
-const templateFnString = flagIcon.FlagIconTemplate.toString();
-const templateHTML = `<template>
-    ${templateFnString}
-</template>`;
-const $ = cheerio.load(templateHTML);
-parseNode($.root());
-let tokensEvaluated = $.root().html();
-//debugger;
-tokensEvaluated = tokensEvaluated.substr('<template>'.length);
-tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
-const arrowFunction = /=&gt;/g;
-tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
-const joinAposApos = /&apos;&apos;/g;
-tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
-tokensEvaluated = trimOutside(tokensEvaluated, '`');
+processFACETSFile(filePath);
 
-console.log(tokensEvaluated);
+function processFACETSFile(filePath: string){
+    const facetsFile = require(filePath);
+    const fileName = path.basename(filePath);
+    console.log(fileName);
+    const templateName = fileName + "Template"; 
+    const templateFnString = facetsFile[templateName].toString();
+    const templateHTML = `<template>
+        ${templateFnString}
+    </template>`;
+    const $ = cheerio.load(templateHTML);
+    parseNode($.root(), $);
+    let tokensEvaluated = $.root().html();
+    //debugger;
+    tokensEvaluated = tokensEvaluated.substr('<template>'.length);
+    tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
+    const arrowFunction = /=&gt;/g;
+    tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
+    const joinAposApos = /&apos;&apos;/g;
+    tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
+    tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    console.log(tokensEvaluated);
+    
+}
 
 // const parsed = esprima.parse(tokensEvaluated);
 
@@ -42,10 +51,10 @@ function trimOutside(s: string, start: string, end?: string) : string {
     if(iPosOfEnd === -1) return s.substr(iPosOfStart + start.length);
     return s.substring(iPosOfStart + start.length, iPosOfEnd);
 }
-function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
+function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement, $: CheerioStatic){
     if(!nodeElement) return;
     if(nodeElement.type==='text'){
-        populateTextNode(nodeElement, templateTokenPair, parent);
+        populateTextNode(nodeElement, templateTokenPair, parent, $);
     }else{
         populateAttributes(nodeElement, templateTokenPair);
     }
@@ -53,18 +62,18 @@ function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair
     if(!children) return;
     for(let i = 0, ii = children.length; i < ii; i++){
         const child = children[i];
-        parseNodeElement(child, templateTokenPair, nodeElement);
+        parseNodeElement(child, templateTokenPair, nodeElement, $);
     }
 }
 
-function parseNode($node:  Cheerio){
+function parseNode($node:  Cheerio, $: CheerioStatic){
     const templateTokenPair: IPair = {
         lhs: '${',
         rhs: '}'
     };
     for(let i = 0, ii = $node.length; i< ii; i++){
         const node = $node[i];
-        parseNodeElement(node, templateTokenPair, null)       
+        parseNodeElement(node, templateTokenPair, null, $);       
     }
     
     
@@ -148,7 +157,7 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
 
 }
 
-function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement){
+function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement, $: CheerioStatic){
     if(parent.children.length !== 1) {
         const text = nodeElement['data'] as string;
         const lines = text.split('\n');

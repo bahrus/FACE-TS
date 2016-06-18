@@ -1,26 +1,32 @@
 "use strict";
-var esprima = require('esprima');
+const esprima = require('esprima');
 var cheerio = require('cheerio');
+const path = require('path');
 const filePath = './Tests/FlagIcon';
-//import flagIcon = require(filePath);
-var flagIcon = require('./Tests/FlagIcon');
 //var flagIcon = require(filePath);
-const templateFnString = flagIcon.FlagIconTemplate.toString();
-const templateHTML = `<template>
-    ${templateFnString}
-</template>`;
-const $ = cheerio.load(templateHTML);
-parseNode($.root());
-let tokensEvaluated = $.root().html();
-//debugger;
-tokensEvaluated = tokensEvaluated.substr('<template>'.length);
-tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
-const arrowFunction = /=&gt;/g;
-tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
-const joinAposApos = /&apos;&apos;/g;
-tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
-tokensEvaluated = trimOutside(tokensEvaluated, '`');
-console.log(tokensEvaluated);
+processFACETSFile(filePath);
+function processFACETSFile(filePath) {
+    const facetsFile = require(filePath);
+    const fileName = path.basename(filePath);
+    console.log(fileName);
+    const templateName = fileName + "Template";
+    const templateFnString = facetsFile[templateName].toString();
+    const templateHTML = `<template>
+        ${templateFnString}
+    </template>`;
+    const $ = cheerio.load(templateHTML);
+    parseNode($.root(), $);
+    let tokensEvaluated = $.root().html();
+    //debugger;
+    tokensEvaluated = tokensEvaluated.substr('<template>'.length);
+    tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
+    const arrowFunction = /=&gt;/g;
+    tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
+    const joinAposApos = /&apos;&apos;/g;
+    tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
+    tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    console.log(tokensEvaluated);
+}
 // const parsed = esprima.parse(tokensEvaluated);
 function trimOutside(s, start, end) {
     if (!end)
@@ -31,11 +37,11 @@ function trimOutside(s, start, end) {
         return s.substr(iPosOfStart + start.length);
     return s.substring(iPosOfStart + start.length, iPosOfEnd);
 }
-function parseNodeElement(nodeElement, templateTokenPair, parent) {
+function parseNodeElement(nodeElement, templateTokenPair, parent, $) {
     if (!nodeElement)
         return;
     if (nodeElement.type === 'text') {
-        populateTextNode(nodeElement, templateTokenPair, parent);
+        populateTextNode(nodeElement, templateTokenPair, parent, $);
     }
     else {
         populateAttributes(nodeElement, templateTokenPair);
@@ -45,17 +51,17 @@ function parseNodeElement(nodeElement, templateTokenPair, parent) {
         return;
     for (let i = 0, ii = children.length; i < ii; i++) {
         const child = children[i];
-        parseNodeElement(child, templateTokenPair, nodeElement);
+        parseNodeElement(child, templateTokenPair, nodeElement, $);
     }
 }
-function parseNode($node) {
+function parseNode($node, $) {
     const templateTokenPair = {
         lhs: '${',
         rhs: '}'
     };
     for (let i = 0, ii = $node.length; i < ii; i++) {
         const node = $node[i];
-        parseNodeElement(node, templateTokenPair, null);
+        parseNodeElement(node, templateTokenPair, null, $);
     }
 }
 function splitPairs(text, pair) {
@@ -131,7 +137,7 @@ function populateAttributes(nodeElement, templateTokenPair) {
         }
     }
 }
-function populateTextNode(nodeElement, templateTokenPair, parent) {
+function populateTextNode(nodeElement, templateTokenPair, parent, $) {
     if (parent.children.length !== 1) {
         const text = nodeElement['data'];
         const lines = text.split('\n');
