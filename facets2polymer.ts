@@ -21,7 +21,6 @@ processFACETSFile(filePath);
 function processFACETSFile(filePath: string){
     const facetsFile = require(filePath);
     const fileName = path.basename(filePath);
-    console.log(fileName);
     const templateName = fileName + "Template"; 
     const templateFnString = facetsFile[templateName].toString();
     const templateHTML = `<template>
