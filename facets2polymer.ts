@@ -37,10 +37,19 @@ function processFACETSFile(filePath: string){
     const joinAposApos = /&apos;&apos;/g;
     tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
     tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    
+    const domID  = fileName; //TODO
+    tokensEvaluated = `
+    <dom id="${domID}">
+        ${tokensEvaluated}>
+    s</dom>`;
     console.log(tokensEvaluated);
     
 }
 
+function toSnakeCase(s: string){
+    //const caps = \(A-Z)\g
+}
 // const parsed = esprima.parse(tokensEvaluated);
 
 function trimOutside(s: string, start: string, end?: string) : string {

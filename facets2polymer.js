@@ -1,6 +1,6 @@
 "use strict";
 const esprima = require('esprima');
-var cheerio = require('cheerio');
+const cheerio = require('cheerio');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
 //var flagIcon = require(filePath);
@@ -8,7 +8,6 @@ processFACETSFile(filePath);
 function processFACETSFile(filePath) {
     const facetsFile = require(filePath);
     const fileName = path.basename(filePath);
-    console.log(fileName);
     const templateName = fileName + "Template";
     const templateFnString = facetsFile[templateName].toString();
     const templateHTML = `<template>
@@ -25,7 +24,15 @@ function processFACETSFile(filePath) {
     const joinAposApos = /&apos;&apos;/g;
     tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
     tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    const domID = fileName; //TODO
+    tokensEvaluated = `
+    <dom id="${domID}">
+        ${tokensEvaluated}>
+    s</dom>`;
     console.log(tokensEvaluated);
+}
+function toSnakeCase(s) {
+    //const caps = \(A-Z)\g
 }
 // const parsed = esprima.parse(tokensEvaluated);
 function trimOutside(s, start, end) {
