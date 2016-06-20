@@ -4,8 +4,8 @@ const cheerio = require('cheerio');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
 //var flagIcon = require(filePath);
-processFACETSFile(filePath);
-function processFACETSFile(filePath) {
+processFACETSFileTemplate(filePath);
+function processFACETSFileTemplate(filePath) {
     const facetsFile = require(filePath);
     const fileName = path.basename(filePath);
     const templateName = fileName + "Template";
@@ -27,12 +27,19 @@ function processFACETSFile(filePath) {
     const domID = fileName; //TODO
     tokensEvaluated = `
     <dom id="${domID}">
-        ${tokensEvaluated}>
-    s</dom>`;
+        ${tokensEvaluated}
+    </dom>`;
     console.log(tokensEvaluated);
+    processFACETSFileClass(fileName, facetsFile);
+}
+function processFACETSFileClass(className, facetsFile) {
+    debugger;
+    const classProto = facetsFile[className];
+    console.log(classProto);
+    debugger;
 }
 function toSnakeCase(s) {
-    //const caps = \(A-Z)\g
+    const caps = /(A-Z)/g;
 }
 // const parsed = esprima.parse(tokensEvaluated);
 function trimOutside(s, start, end) {

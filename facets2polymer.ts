@@ -16,9 +16,10 @@ export interface IPair{
 }
 
 //var flagIcon = require(filePath);
-processFACETSFile(filePath);
+processFACETSFileTemplate(filePath);
 
-function processFACETSFile(filePath: string){
+
+function processFACETSFileTemplate(filePath: string){
     const facetsFile = require(filePath);
     const fileName = path.basename(filePath);
     const templateName = fileName + "Template"; 
@@ -41,14 +42,21 @@ function processFACETSFile(filePath: string){
     const domID  = fileName; //TODO
     tokensEvaluated = `
     <dom id="${domID}">
-        ${tokensEvaluated}>
-    s</dom>`;
+        ${tokensEvaluated}
+    </dom>`;
     console.log(tokensEvaluated);
+    processFACETSFileClass(fileName, facetsFile);
     
 }
 
+function processFACETSFileClass(className: string, facetsFile: any){
+    debugger;
+    const classProto = facetsFile[className];
+    console.log(classProto);
+    debugger;
+}
 function toSnakeCase(s: string){
-    //const caps = \(A-Z)\g
+    const caps = /(A-Z)/g
 }
 // const parsed = esprima.parse(tokensEvaluated);
 
