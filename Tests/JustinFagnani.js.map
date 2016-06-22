@@ -1,1 +1,1 @@
-{"version":3,"file":"JustinFagnani.js","sourceRoot":"","sources":["JustinFagnani.ts"],"names":[],"mappings":"AAAA,gBAAgB,WAAW;IACvB,iBAAiB;QACb,IAAI,CAAC,cAAc,CAAC,CAAC,EAAC,IAAI,EAAC,MAAM,EAAC,CAAC,CAAC,SAAS,GAAG,aAAa,CAAC;IAClE,CAAC;AACL,CAAC;AAAA"}
+{"version":3,"file":"JustinFagnani.js","sourceRoot":"","sources":["JustinFagnani.ts"],"names":["E","E.connectedCallback"],"mappings":"AAAA,gBAAgB,WAAW;IACvBA,iBAAiBA;QACbC,IAAIA,CAACA,cAAcA,CAACA,CAACA,EAACA,IAAIA,EAACA,MAAMA,EAACA,CAACA,CAACA,SAASA,GAAGA,aAAaA,CAACA;IAClEA,CAACA;AACLD,CAACA;AAAA"}

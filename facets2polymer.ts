@@ -44,16 +44,21 @@ function processFACETSFileTemplate(filePath: string){
     <dom id="${domID}">
         ${tokensEvaluated}
     </dom>`;
-    console.log(tokensEvaluated);
+    //console.log(tokensEvaluated);
     processFACETSFileClass(fileName, facetsFile);
     
 }
 
 function processFACETSFileClass(className: string, facetsFile: any){
-    debugger;
-    const classProto = facetsFile[className];
-    console.log(classProto);
-    debugger;
+    const classDef = facetsFile[className];
+    console.log(classDef);
+    const classProto = classDef.prototype;
+    const propNames = Object.getOwnPropertyNames(classProto);
+    for(let i = 0, ii = propNames.length; i < ii; i++){
+        const propName = propNames[i];
+        console.log(propName);
+    }
+    
 }
 function toSnakeCase(s: string){
     const caps = /(A-Z)/g
