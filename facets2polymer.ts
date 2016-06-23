@@ -39,7 +39,7 @@ function processFACETSFileTemplate(filePath: string){
     tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
     tokensEvaluated = trimOutside(tokensEvaluated, '`');
     
-    const domID  = fileName; //TODO
+    const domID  = toSnakeCase(fileName); //TODO
     tokensEvaluated = `
     <dom id="${domID}">
         ${tokensEvaluated}
@@ -49,19 +49,49 @@ function processFACETSFileTemplate(filePath: string){
     
 }
 
+interface IPropertyInfo {
+    propertyDescriptor: PropertyDescriptor;
+}
+
 function processFACETSFileClass(className: string, facetsFile: any){
+    
     const classDef = facetsFile[className];
     console.log(classDef);
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
+    const properties : {[key: string] : IPropertyInfo}  = {};
+    const methods : {[key: string] : PropertyDescriptor}  = {};
     for(let i = 0, ii = propNames.length; i < ii; i++){
         const propName = propNames[i];
         console.log(propName);
+        const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
+        if(propDescriptor.get){
+                const propertyInfo : IPropertyInfo = {
+                    propertyDescriptor: propDescriptor,
+                };
+                console.log(propDescriptor.get.toString());
+        }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
+            debugger;
+        }
+        
     }
-    
+    const tagName = toSnakeCase(className);
+    const polymerPrototypeString = `
+    Polymer({
+        is: ${tagName},
+        properties: {
+
+        }
+    });
+    `;
+    console.log(polymerPrototypeString);
 }
 function toSnakeCase(s: string){
-    const caps = /(A-Z)/g
+	return s.replace(/([A-Z])/g, ($1, a, idx) => {
+        const dash = idx === 0 ? '' : '-';
+        return dash + $1.toLowerCase();
+    });
+
 }
 // const parsed = esprima.parse(tokensEvaluated);
 

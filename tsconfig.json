@@ -2,6 +2,12 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "sourceMap": true
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "bower_components"
+    ]
 }

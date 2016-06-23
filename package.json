@@ -1,0 +1,25 @@
+{
+  "name": "face_ts",
+  "version": "1.0.0",
+  "description": "1)  **F**ramework **A**gnostic **C**ustom **E**lement **T**emplates\r 2)  **F**aces in **T**ypescript",
+  "main": "facets2polymer.js",
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "reflect-metadata": "^0.1.3",
+    "esprima": "^2.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bahrus/FACE-TS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bahrus/FACE-TS/issues"
+  },
+  "homepage": "https://github.com/bahrus/FACE-TS#readme"
+}

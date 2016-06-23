@@ -1,3 +1,5 @@
+///<reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
+
 "use strict"
 export const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
@@ -40,7 +42,7 @@ export class FlagIcon extends HTMLElement {
     connectedCallback() {
         
     }
-
+    @Reflect.metadata('polymer-notify', true)
     get country() {
         return this._countryCode;
     }
