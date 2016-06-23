@@ -1,0 +1,3 @@
+/node_modules/reflect-metadata/test/*.js
+*.map
+*.js

@@ -1,6 +1,9 @@
 ///<reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
 "use strict"
+declare var require;
+require('reflect-metadata/Reflect');
+
 export const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 

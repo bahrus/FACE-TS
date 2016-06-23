@@ -1,8 +1,10 @@
+//<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 "use strict"
 
 declare var require;
-const esprima = require('esprima');
+//const esprima = require('esprima');
 import cheerio = require('cheerio');
+require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
 
@@ -69,9 +71,11 @@ function processFACETSFileClass(className: string, facetsFile: any){
                 const propertyInfo : IPropertyInfo = {
                     propertyDescriptor: propDescriptor,
                 };
+                const keys = Reflect.getMetadataKeys(classProto, propName);
+                debugger;
                 console.log(propDescriptor.get.toString());
         }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
-            debugger;
+            //debugger;
         }
         
     }
