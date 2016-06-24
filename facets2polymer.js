@@ -1,7 +1,7 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 "use strict";
 //const esprima = require('esprima');
-var cheerio = require('cheerio');
+const cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
@@ -39,7 +39,7 @@ function processFACETSFileClass(className, facetsFile) {
     console.log(classDef);
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
-    const properties = {};
+    const properties = [];
     const methods = {};
     for (let i = 0, ii = propNames.length; i < ii; i++) {
         const propName = propNames[i];
@@ -48,9 +48,24 @@ function processFACETSFileClass(className, facetsFile) {
         if (propDescriptor.get) {
             const propertyInfo = {
                 propertyDescriptor: propDescriptor,
+                metadata: {},
+                name: propName,
             };
             const keys = Reflect.getMetadataKeys(classProto, propName);
-            debugger;
+            for (let j = 0, jj = keys.length; j < jj; j++) {
+                const key = keys[j];
+                console.log(key);
+                if (key === 'design:type') {
+                    propertyInfo.type = Reflect.getMetadata(key, classProto);
+                    continue;
+                }
+                const polymerPref = 'polymer-';
+                if (!key.startsWith('polymer-'))
+                    continue;
+                const actualKey = key.substr('polymer-'.length);
+                propertyInfo.metadata[key] = Reflect.getMetadata(key, classProto);
+            }
+            properties.push(propertyInfo);
             console.log(propDescriptor.get.toString());
         }
         else if (propDescriptor.value && typeof (propDescriptor.value) === 'function') {
@@ -61,7 +76,12 @@ function processFACETSFileClass(className, facetsFile) {
     Polymer({
         is: ${tagName},
         properties: {
-
+                                ${properties.map(property => `
+            ${property.name}:{
+                type: ${property.type},
+            },
+            
+                                `)}
         }
     });
     `;

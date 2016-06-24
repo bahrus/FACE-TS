@@ -52,7 +52,10 @@ function processFACETSFileTemplate(filePath: string){
 }
 
 interface IPropertyInfo {
+    name: string;
     propertyDescriptor: PropertyDescriptor;
+    metadata: {[key: string]: string};
+    type?: any;
 }
 
 function processFACETSFileClass(className: string, facetsFile: any){
@@ -61,7 +64,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
     console.log(classDef);
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
-    const properties : {[key: string] : IPropertyInfo}  = {};
+    const properties : IPropertyInfo[]  = [];
     const methods : {[key: string] : PropertyDescriptor}  = {};
     for(let i = 0, ii = propNames.length; i < ii; i++){
         const propName = propNames[i];
@@ -70,9 +73,23 @@ function processFACETSFileClass(className: string, facetsFile: any){
         if(propDescriptor.get){
                 const propertyInfo : IPropertyInfo = {
                     propertyDescriptor: propDescriptor,
+                    metadata:{},
+                    name:propName,
                 };
-                const keys = Reflect.getMetadataKeys(classProto, propName);
-                debugger;
+                const keys = Reflect.getMetadataKeys(classProto, propName) as string[];
+                for(let j = 0, jj= keys.length; j < jj; j++){
+                    const key = keys[j];
+                    console.log(key);
+                    if(key === 'design:type') {
+                        propertyInfo.type =Reflect.getMetadata(key, classProto);
+                        continue;
+                    }
+                    const polymerPref = 'polymer-'
+                    if(!key.startsWith('polymer-')) continue;
+                    const actualKey = key.substr('polymer-'.length);
+                    propertyInfo.metadata[key] =Reflect.getMetadata(key, classProto);
+                }
+                properties.push(propertyInfo);
                 console.log(propDescriptor.get.toString());
         }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
             //debugger;
@@ -84,7 +101,12 @@ function processFACETSFileClass(className: string, facetsFile: any){
     Polymer({
         is: ${tagName},
         properties: {
-
+                                ${properties.map(property => `
+            ${property.name}:{
+                type: ${property.type},
+            },
+            
+                                `)}
         }
     });
     `;
