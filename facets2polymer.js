@@ -54,16 +54,19 @@ function processFACETSFileClass(className, facetsFile) {
             const keys = Reflect.getMetadataKeys(classProto, propName);
             for (let j = 0, jj = keys.length; j < jj; j++) {
                 const key = keys[j];
-                console.log(key);
                 if (key === 'design:type') {
-                    propertyInfo.type = Reflect.getMetadata(key, classProto);
+                    const typeSig = Reflect.getMetadata(key, classProto, propName).toString();
+                    const typeSigWOFn = typeSig.substr('function '.length);
+                    const iPosOfParent = typeSigWOFn.indexOf('(');
+                    const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
+                    propertyInfo.type = typeSigWOParenthesis;
                     continue;
                 }
                 const polymerPref = 'polymer-';
                 if (!key.startsWith('polymer-'))
                     continue;
                 const actualKey = key.substr('polymer-'.length);
-                propertyInfo.metadata[key] = Reflect.getMetadata(key, classProto);
+                propertyInfo.metadata[key] = Reflect.getMetadata(key, classProto, propName);
             }
             properties.push(propertyInfo);
             console.log(propDescriptor.get.toString());

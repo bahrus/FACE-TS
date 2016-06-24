@@ -53,7 +53,7 @@ class FlagIcon extends HTMLElement {
 }
 __decorate([
     Reflect.metadata('polymer-notify', true), 
-    __metadata('design:type', Object)
+    __metadata('design:type', String)
 ], FlagIcon.prototype, "country", null);
 exports.FlagIcon = FlagIcon;
 //# sourceMappingURL=FlagIcon.js.map

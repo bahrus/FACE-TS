@@ -46,10 +46,10 @@ export class FlagIcon extends HTMLElement {
         
     }
     @Reflect.metadata('polymer-notify', true)
-    get country() {
+    get country() : string{
         return this._countryCode;
     }
-    set country(v) {
+    set country(v: string) {
         this.setAttribute("country", v);
     }
 
