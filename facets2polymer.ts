@@ -50,11 +50,16 @@ function processFACETSFileTemplate(filePath: string){
     processFACETSFileClass(fileName, facetsFile);
     
 }
+interface INameValuePair{
+    name: string;
+    value: string;
+}
 
 interface IPropertyInfo {
     name: string;
     propertyDescriptor: PropertyDescriptor;
-    metadata: {[key: string]: string};
+    //metadata: {[key: string]: string};
+    metadata: INameValuePair[];
     type?: any;
 }
 
@@ -73,7 +78,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
         if(propDescriptor.get){
                 const propertyInfo : IPropertyInfo = {
                     propertyDescriptor: propDescriptor,
-                    metadata:{},
+                    metadata:[],
                     name:propName,
                 };
                 const keys = Reflect.getMetadataKeys(classProto, propName) as string[];
@@ -91,7 +96,11 @@ function processFACETSFileClass(className: string, facetsFile: any){
                     const polymerPref = 'polymer-'
                     if(!key.startsWith('polymer-')) continue;
                     const actualKey = key.substr('polymer-'.length);
-                    propertyInfo.metadata[key] =Reflect.getMetadata(key, classProto, propName);
+                    const metaPair : INameValuePair = {
+                        name: actualKey,
+                        value: Reflect.getMetadata(key, classProto, propName),
+                    };
+                    propertyInfo.metadata.push(metaPair);
                 }
                 properties.push(propertyInfo);
                 console.log(propDescriptor.get.toString());
@@ -105,12 +114,15 @@ function processFACETSFileClass(className: string, facetsFile: any){
     Polymer({
         is: ${tagName},
         properties: {
-                                ${properties.map(property => `
+                                            ${properties.map(property => `
             ${property.name}:{
                 type: ${property.type},
-            },
+                                                ${property.metadata.map(nvp=>`
+                                                    
+                                                `)}
+            }
             
-                                `)}
+                                            `)}
         }
     });
     `;
