@@ -118,7 +118,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
             ${property.name}:{
                 type: ${property.type},
                                                 ${property.metadata.map(nvp=>`
-                                                    
+                ${nvp.name}: ${nvp.value}                                    
                                                 `)}
             }
             

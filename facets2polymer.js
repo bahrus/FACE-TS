@@ -1,7 +1,7 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 "use strict";
 //const esprima = require('esprima');
-const cheerio = require('cheerio');
+var cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
@@ -48,7 +48,7 @@ function processFACETSFileClass(className, facetsFile) {
         if (propDescriptor.get) {
             const propertyInfo = {
                 propertyDescriptor: propDescriptor,
-                metadata: {},
+                metadata: [],
                 name: propName,
             };
             const keys = Reflect.getMetadataKeys(classProto, propName);
@@ -66,7 +66,11 @@ function processFACETSFileClass(className, facetsFile) {
                 if (!key.startsWith('polymer-'))
                     continue;
                 const actualKey = key.substr('polymer-'.length);
-                propertyInfo.metadata[key] = Reflect.getMetadata(key, classProto, propName);
+                const metaPair = {
+                    name: actualKey,
+                    value: Reflect.getMetadata(key, classProto, propName),
+                };
+                propertyInfo.metadata.push(metaPair);
             }
             properties.push(propertyInfo);
             console.log(propDescriptor.get.toString());
@@ -79,12 +83,15 @@ function processFACETSFileClass(className, facetsFile) {
     Polymer({
         is: ${tagName},
         properties: {
-                                ${properties.map(property => `
+                                            ${properties.map(property => `
             ${property.name}:{
                 type: ${property.type},
-            },
+                                                ${property.metadata.map(nvp => `
+                ${nvp.name}: ${nvp.value}                                    
+                                                `)}
+            }
             
-                                `)}
+                                            `)}
         }
     });
     `;
