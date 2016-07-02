@@ -3,6 +3,8 @@
 "use strict"
 declare var require;
 require('reflect-metadata/Reflect');
+import rt = require('../@rt');
+
 
 export const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
@@ -21,6 +23,7 @@ class HTMLElement{
 }
 export class FlagIcon extends HTMLElement {
 
+    
     nickNames: string[];
     
     
@@ -32,7 +35,7 @@ export class FlagIcon extends HTMLElement {
         this._countryCode = null;
     }
 
-    get countryCodeImgUrl(){
+    get countryCodeImgUrl() : string{
         return this._countryCodeToImgUrlLookup[this._countryCode]
     }
 
@@ -45,13 +48,16 @@ export class FlagIcon extends HTMLElement {
     connectedCallback() {
         
     }
-    @Reflect.metadata('polymer-notify', true)
-    get country() : string{
-        return this._countryCode;
-    }
-    set country(v: string) {
-        this.setAttribute("country", v);
-    }
+
+    //@Reflect.metadata('polymer-notify', true)
+    @rt.toProp()
+    public country: string = null;
+    // get country() : string{
+    //     return this._countryCode;
+    // }
+    // set country(v: string) {
+    //     this.setAttribute("country", v);
+    // }
 
     get CountryClickHandler(){
         return function(e){

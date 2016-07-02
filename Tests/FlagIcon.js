@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 require('reflect-metadata/Reflect');
+var rt = require('../@rt');
 exports.FlagIconTemplate = (flag_icon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
@@ -28,6 +29,8 @@ class HTMLElement {
 class FlagIcon extends HTMLElement {
     constructor() {
         super();
+        //@Reflect.metadata('polymer-notify', true)
+        this.country = null;
         this._countryCode = null;
     }
     get countryCodeImgUrl() {
@@ -40,20 +43,20 @@ class FlagIcon extends HTMLElement {
     }
     connectedCallback() {
     }
-    get country() {
-        return this._countryCode;
-    }
-    set country(v) {
-        this.setAttribute("country", v);
-    }
+    // get country() : string{
+    //     return this._countryCode;
+    // }
+    // set country(v: string) {
+    //     this.setAttribute("country", v);
+    // }
     get CountryClickHandler() {
         return function (e) {
         };
     }
 }
 __decorate([
-    Reflect.metadata('polymer-notify', true), 
+    rt.toProp(), 
     __metadata('design:type', String)
-], FlagIcon.prototype, "country", null);
+], FlagIcon.prototype, "country", void 0);
 exports.FlagIcon = FlagIcon;
 //# sourceMappingURL=FlagIcon.js.map

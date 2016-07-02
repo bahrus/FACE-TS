@@ -69,6 +69,8 @@ function processFACETSFileClass(className: string, facetsFile: any){
     console.log(classDef);
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
+    console.log(Object.keys(classProto));
+    console.log(propNames);
     const properties : IPropertyInfo[]  = [];
     const methods : {[key: string] : PropertyDescriptor}  = {};
     for(let i = 0, ii = propNames.length; i < ii; i++){
