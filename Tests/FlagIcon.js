@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 require('reflect-metadata/Reflect');
 var rt = require('../@rt');
+const country_change_handler = 'country_change_handler';
 exports.FlagIconTemplate = (flag_icon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
@@ -49,13 +50,17 @@ class FlagIcon extends HTMLElement {
     // set country(v: string) {
     //     this.setAttribute("country", v);
     // }
+    [country_change_handler](newVal, oldVal) {
+    }
     get CountryClickHandler() {
         return function (e) {
         };
     }
 }
 __decorate([
-    rt.toProp(), 
+    rt.toProp({
+        polymer_observer: country_change_handler,
+    }), 
     __metadata('design:type', String)
 ], FlagIcon.prototype, "country", void 0);
 exports.FlagIcon = FlagIcon;

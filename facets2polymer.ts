@@ -75,7 +75,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
     const methods : {[key: string] : PropertyDescriptor}  = {};
     for(let i = 0, ii = propNames.length; i < ii; i++){
         const propName = propNames[i];
-        console.log(propName);
+        //console.log(propName);
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if(propDescriptor.get){
                 const propertyInfo : IPropertyInfo = {
@@ -84,28 +84,33 @@ function processFACETSFileClass(className: string, facetsFile: any){
                     name:propName,
                 };
                 const keys = Reflect.getMetadataKeys(classProto, propName) as string[];
-                for(let j = 0, jj= keys.length; j < jj; j++){
-                    const key = keys[j];
-                    if(key === 'design:type') {
-                        const typeSig = Reflect.getMetadata(key, classProto, propName).toString();
-                        const typeSigWOFn = typeSig.substr('function '.length);
-                        const iPosOfParent = typeSigWOFn.indexOf('(');
-                        const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
-                        propertyInfo.type = typeSigWOParenthesis;
-                        
-                        continue;
-                    }
-                    const polymerPref = 'polymer-'
-                    if(!key.startsWith('polymer-')) continue;
-                    const actualKey = key.substr('polymer-'.length);
-                    const metaPair : INameValuePair = {
-                        name: actualKey,
-                        value: Reflect.getMetadata(key, classProto, propName),
-                    };
-                    propertyInfo.metadata.push(metaPair);
+                if(propName === 'country'){
+                    console.log(keys);
                 }
+                const typeInfo = Reflect.getMetadata('design:type', classProto, propName);
+                if(typeInfo){
+                    const typeSig = typeInfo.toString();
+                    const typeSigWOFn = typeSig.substr('function '.length);
+                    const iPosOfParent = typeSigWOFn.indexOf('(');
+                    const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
+                    propertyInfo.type = typeSigWOParenthesis;
+                }
+                const webComponentProps = Reflect.getMetadata('WebComponentProps', classProto, propName);
+                if(webComponentProps){
+                    for(var key in webComponentProps){
+                        const polymerPref = 'polymer_'
+                        if(!key.startsWith(polymerPref)) continue;
+                        const actualKey = key.substr(polymerPref.length);
+                        const metaPair : INameValuePair = {
+                            name: actualKey,
+                            value: webComponentProps[key],
+                        };
+                        propertyInfo.metadata.push(metaPair);
+                    }
+                }
+                
                 properties.push(propertyInfo);
-                console.log(propDescriptor.get.toString());
+                //console.log(propDescriptor.get.toString());
         }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
             //debugger;
         }
@@ -118,7 +123,10 @@ function processFACETSFileClass(className: string, facetsFile: any){
         properties: {
                                             ${properties.map(property => `
             ${property.name}:{
+                                                ${property.type? `
                 type: ${property.type},
+                                                ` : ''}
+                
                                                 ${property.metadata.map(nvp=>`
                 ${nvp.name}: ${nvp.value}                                    
                                                 `)}

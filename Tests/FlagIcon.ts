@@ -5,7 +5,7 @@ declare var require;
 require('reflect-metadata/Reflect');
 import rt = require('../@rt');
 
-
+const country_change_handler = 'country_change_handler';
 export const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
@@ -50,7 +50,9 @@ export class FlagIcon extends HTMLElement {
     }
 
     //@Reflect.metadata('polymer-notify', true)
-    @rt.toProp()
+    @rt.toProp({
+        polymer_observer: country_change_handler,
+    })
     public country: string = null;
     // get country() : string{
     //     return this._countryCode;
@@ -58,6 +60,10 @@ export class FlagIcon extends HTMLElement {
     // set country(v: string) {
     //     this.setAttribute("country", v);
     // }
+
+    [country_change_handler](newVal: string, oldVal: string){
+
+    }
 
     get CountryClickHandler(){
         return function(e){

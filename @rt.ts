@@ -21,18 +21,25 @@ const setter = function(ID: string){
 	}
 }
 
-export function toProp(){
-		return (classPrototype: any, fieldName: string) =>{
-			
-			//from http://blog.wolksoftware.com/decorators-metadata-reflection-in-typescript-from-novice-to-expert-part-ii
-			if (delete this[fieldName]) {
-			    // Create new property with getter and setter
-			    Object.defineProperty(classPrototype, fieldName, {
-			      get: getter(fieldName),
-			      set: setter(fieldName),
-			      enumerable: true,
-			      configurable: true
-			    });
-	  		}
+export interface IPropertyProps{
+	polymer_notify?: boolean;
+	polymer_observer?: string; 
+}
+
+export function toProp(props?: IPropertyProps){
+	return (classPrototype: any, fieldName: string) =>{
+		
+		//from http://blog.wolksoftware.com/decorators-metadata-reflection-in-typescript-from-novice-to-expert-part-ii
+		if (delete this[fieldName]) {
+			// Create new property with getter and setter
+			Object.defineProperty(classPrototype, fieldName, {
+				get: getter(fieldName),
+				set: setter(fieldName),
+				enumerable: true,
+				configurable: true,
+				
+			});
+			Reflect.defineMetadata('WebComponentProps', props, classPrototype, fieldName);
 		}
 	}
+}
