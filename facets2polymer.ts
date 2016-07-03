@@ -120,19 +120,12 @@ function processFACETSFileClass(className: string, facetsFile: any){
     const polymerPrototypeString = `
     Polymer({
         is: ${tagName},
-        properties: {
-                                            ${properties.map(property => `
-            ${property.name}:{
-                                                ${property.type? `
-                type: ${property.type},
-                                                ` : ''}
-                
-                                                ${property.metadata.map(nvp=>`
-                ${nvp.name}: ${nvp.value}                                    
-                                                `)}
-            }
-            
-                                            `)}
+        properties: {                           ${properties.map(property => `
+            ${property.name}:{                      ${property.type? `
+                type: ${property.type},             ` : ''}
+                                                    ${property.metadata.map(nvp=>`
+                    ${nvp.name}: ${nvp.value}       `)}
+            }                                   `)}
         }
     });
     `;
