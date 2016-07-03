@@ -31,7 +31,7 @@ class FlagIcon extends HTMLElement {
     constructor() {
         super();
         //@Reflect.metadata('polymer-notify', true)
-        this.country = null;
+        this.country = 'us';
         this._countryCode = null;
     }
     get countryCodeImgUrl() {
@@ -60,6 +60,7 @@ class FlagIcon extends HTMLElement {
 __decorate([
     rt.toProp({
         polymer_observer: country_change_handler,
+        defaultValue: 'us',
     }), 
     __metadata('design:type', String)
 ], FlagIcon.prototype, "country", void 0);

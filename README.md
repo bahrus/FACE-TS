@@ -51,22 +51,25 @@ We already have seen different ergonomic layers arise, including Polymer, X-tags
 Bosonic, and SkateJS, which adhere to different paradigms.  Aurelia might be considered 
 another one, though Aurelia's scope is much broader.  Many more, no doubt, will surface.
 
+In addition to libraries that support defining W3C compliant custom elements, there are additional
+libraries that support their own proprietary way of defining components.  Examples are angular 2,
+aurelia, ember, vue.js, react, and many more.
+
 The idea of different teams of component developers choosing whatever ergonomic layer
  (+ other dependencies) they desire, and to be able to have all the components working 
  together in perfect harmony, is a big draw for the web component technology. But it 
- comes with a cost.  If each component on a page has its own ergonomic library, that's 
+ comes with a cost.  If each component on a page has its own ergonomic library (or its own proprietary
+ rich framework behind it), that's 
  potentially a significant amount of code overhead just from those 
  different ergonomic layers.  For many of those components, the developers may be 
  ambivalent which ergonomic layer is the best, and just want to get the job done.  
  If one application tends to use primarily Polymer, it would be nice if the component 
- could utilize it if is present.  If Aurelia, the same component could leverage it.  
+ could utilize it if is present.  If Aurelia, the same component could leverage it. Some web component 
+ ergonomic layers, like SkateJS, explicitly suggest they can be a "compilation" target, especially 
+ when defining the visual template representation. 
 
-It is overly ambitious to try to come up with one grand unified markup / code definition 
-that could account for every approach.  But of the many "ergonomic layers," 
-one popular category will be those which rely on a template driven markup DSL. 
-Examples are Polymer and Aurelia.  These template renderers will not necessarily share 
-the same syntax.   Each may utilize its own rocket-science in terms of how to achieve 
-the best performing results.  Wouldn't it be nice if the same component definition 
+Each of these component ergonomic layer and/or component framework utilizes its own rocket-science 
+in terms of how to achieve the best performing results.  Wouldn't it be nice if the same component definition 
 could be used for either?  That's what FACETS is designed to help with.
 
 Specifically, FACETS is a file format meant to accomplish the following goals:

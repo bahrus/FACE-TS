@@ -7,7 +7,7 @@ import cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
-
+import rt = require('./@rt');
 
 //import flagIcon = require(filePath);
 //import flagIcon = require('./Tests/FlagIcon');
@@ -84,9 +84,6 @@ function processFACETSFileClass(className: string, facetsFile: any){
                     name:propName,
                 };
                 const keys = Reflect.getMetadataKeys(classProto, propName) as string[];
-                if(propName === 'country'){
-                    console.log(keys);
-                }
                 const typeInfo = Reflect.getMetadata('design:type', classProto, propName);
                 if(typeInfo){
                     const typeSig = typeInfo.toString();
@@ -95,7 +92,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
                     const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
                     propertyInfo.type = typeSigWOParenthesis;
                 }
-                const webComponentProps = Reflect.getMetadata('WebComponentProps', classProto, propName);
+                const webComponentProps = Reflect.getMetadata('WebComponentProps', classProto, propName) as rt.IPropertyProps;
                 if(webComponentProps){
                     for(var key in webComponentProps){
                         const polymerPref = 'polymer_'
@@ -105,6 +102,17 @@ function processFACETSFileClass(className: string, facetsFile: any){
                             name: actualKey,
                             value: webComponentProps[key],
                         };
+                        propertyInfo.metadata.push(metaPair);
+                    }
+                    if(webComponentProps.defaultValue){
+                        let defaultValue = webComponentProps.defaultValue;
+                        if(propertyInfo.type === 'String'){
+                            defaultValue = `'${defaultValue}'`;
+                        }
+                        const metaPair: INameValuePair = {
+                            name: 'value',
+                            value: defaultValue,
+                        }
                         propertyInfo.metadata.push(metaPair);
                     }
                 }
@@ -122,10 +130,10 @@ function processFACETSFileClass(className: string, facetsFile: any){
         is: ${tagName},
         properties: {                           ${properties.map(property => `
             ${property.name}:{                      ${property.type? `
-                type: ${property.type},             ` : ''}
+                type: ${property.type},`            : ''}
                                                     ${property.metadata.map(nvp=>`
-                    ${nvp.name}: ${nvp.value}       `)}
-            }                                   `)}
+                ${nvp.name}: ${nvp.value}`          )}
+            }`                                  )}
         }
     });
     `;

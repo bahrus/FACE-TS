@@ -52,8 +52,9 @@ export class FlagIcon extends HTMLElement {
     //@Reflect.metadata('polymer-notify', true)
     @rt.toProp({
         polymer_observer: country_change_handler,
+        defaultValue: 'us',
     })
-    public country: string = null;
+    public country: string = 'us';
     // get country() : string{
     //     return this._countryCode;
     // }

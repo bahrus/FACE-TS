@@ -54,9 +54,6 @@ function processFACETSFileClass(className, facetsFile) {
                 name: propName,
             };
             const keys = Reflect.getMetadataKeys(classProto, propName);
-            if (propName === 'country') {
-                console.log(keys);
-            }
             const typeInfo = Reflect.getMetadata('design:type', classProto, propName);
             if (typeInfo) {
                 const typeSig = typeInfo.toString();
@@ -78,6 +75,17 @@ function processFACETSFileClass(className, facetsFile) {
                     };
                     propertyInfo.metadata.push(metaPair);
                 }
+                if (webComponentProps.defaultValue) {
+                    let defaultValue = webComponentProps.defaultValue;
+                    if (propertyInfo.type === 'String') {
+                        defaultValue = `'${defaultValue}'`;
+                    }
+                    const metaPair = {
+                        name: 'value',
+                        value: defaultValue,
+                    };
+                    propertyInfo.metadata.push(metaPair);
+                }
             }
             properties.push(propertyInfo);
         }
@@ -90,10 +98,10 @@ function processFACETSFileClass(className, facetsFile) {
         is: ${tagName},
         properties: {                           ${properties.map(property => `
             ${property.name}:{                      ${property.type ? `
-                type: ${property.type},             ` : ''}
+                type: ${property.type},` : ''}
                                                     ${property.metadata.map(nvp => `
-                    ${nvp.name}: ${nvp.value}       `)}
-            }                                   `)}
+                ${nvp.name}: ${nvp.value}`)}
+            }`)}
         }
     });
     `;
