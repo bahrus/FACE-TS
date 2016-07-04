@@ -43,7 +43,7 @@ function processFACETSFileClass(className, facetsFile) {
     console.log(Object.keys(classProto));
     console.log(propNames);
     const properties = [];
-    const methods = {};
+    const methods = [];
     for (let i = 0, ii = propNames.length; i < ii; i++) {
         const propName = propNames[i];
         //console.log(propName);
@@ -101,6 +101,14 @@ function processFACETSFileClass(className, facetsFile) {
             properties.push(propertyInfo);
         }
         else if (propDescriptor.value && typeof (propDescriptor.value) === 'function') {
+            //debugger;
+            if (propName === 'constructor')
+                continue;
+            const methodInfo = {
+                name: propName,
+                value: propDescriptor.value,
+            };
+            methods.push(methodInfo);
         }
     }
     const tagName = toSnakeCase(className);
@@ -113,7 +121,10 @@ function processFACETSFileClass(className, facetsFile) {
                                                     ${property.metadata.map(nvp => `
                 ${nvp.name}: ${nvp.value}`)}
             }`)}
-        }
+        },
+                                                ${methods.map(method => `
+        ${method.name}: ${method.value.toString().replace(method.name, 'function')}
+        `)}
     });
     `;
     console.log(polymerPrototypeString);

@@ -63,6 +63,11 @@ interface IPropertyInfo {
     type?: any;
 }
 
+interface IMethodInfo{
+    name: string;
+    value: any;
+}
+
 function processFACETSFileClass(className: string, facetsFile: any){
     
     const classDef = facetsFile[className];
@@ -72,7 +77,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
     console.log(Object.keys(classProto));
     console.log(propNames);
     const properties : IPropertyInfo[]  = [];
-    const methods : {[key: string] : PropertyDescriptor}  = {};
+    const methods : IMethodInfo[]  = [];
     for(let i = 0, ii = propNames.length; i < ii; i++){
         const propName = propNames[i];
         //console.log(propName);
@@ -130,6 +135,12 @@ function processFACETSFileClass(className: string, facetsFile: any){
                 //console.log(propDescriptor.get.toString());
         }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
             //debugger;
+            if(propName === 'constructor') continue;
+            const methodInfo: IMethodInfo = {
+                name: propName,
+                value: propDescriptor.value,
+            };
+            methods.push(methodInfo);
         }
         
     }
@@ -143,7 +154,10 @@ function processFACETSFileClass(className: string, facetsFile: any){
                                                     ${property.metadata.map(nvp=>`
                 ${nvp.name}: ${nvp.value}`          )}
             }`                                  )}
-        }
+        },
+                                                ${methods.map(method =>`
+        ${method.name}: ${method.value.toString().replace(method.name, 'function')}
+        `                                       )}
     });
     `;
     console.log(polymerPrototypeString);
