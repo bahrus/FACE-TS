@@ -5,6 +5,7 @@ var cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
+var rt = require('./@rt');
 //var flagIcon = require(filePath);
 processFACETSFileTemplate(filePath);
 function processFACETSFileTemplate(filePath) {
@@ -62,7 +63,7 @@ function processFACETSFileClass(className, facetsFile) {
                 const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
                 propertyInfo.type = typeSigWOParenthesis;
             }
-            const webComponentProps = Reflect.getMetadata('WebComponentProps', classProto, propName);
+            const webComponentProps = Reflect.getMetadata(rt.WebComponentProps, classProto, propName);
             if (webComponentProps) {
                 for (var key in webComponentProps) {
                     const polymerPref = 'polymer_';
@@ -87,6 +88,16 @@ function processFACETSFileClass(className, facetsFile) {
                     propertyInfo.metadata.push(metaPair);
                 }
             }
+            const computedProp = Reflect.getMetadata(rt.ComputedRelationship, classProto, propName);
+            if (computedProp) {
+                const polymerArgList = computedProp.argList.map(s => s.replace('this.', ''));
+                const polymerArgString = polymerArgList.join();
+                const metaPair = {
+                    name: 'computed',
+                    value: `${computedProp.computedMethodName}(${polymerArgString})`,
+                };
+                propertyInfo.metadata.push(metaPair);
+            }
             properties.push(propertyInfo);
         }
         else if (propDescriptor.value && typeof (propDescriptor.value) === 'function') {
@@ -95,7 +106,7 @@ function processFACETSFileClass(className, facetsFile) {
     const tagName = toSnakeCase(className);
     const polymerPrototypeString = `
     Polymer({
-        is: ${tagName},
+        is: '${tagName}',
         properties: {                           ${properties.map(property => `
             ${property.name}:{                      ${property.type ? `
                 type: ${property.type},` : ''}

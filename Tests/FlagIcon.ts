@@ -27,23 +27,24 @@ export class FlagIcon extends HTMLElement {
     nickNames: string[];
     
     
-    private _countryCode: string;
 
     private _countryCodeToImgUrlLookup: {[key: string] : string};
     constructor() {
         super();
-        this._countryCode = null;
     }
 
+    computeCountryCodeImgUrl(countryCode){
+        return this._countryCodeToImgUrlLookup[countryCode];
+    }
+    @rt.toProp()
     get countryCodeImgUrl() : string{
-        return this._countryCodeToImgUrlLookup[this._countryCode]
+        return this.computeCountryCodeImgUrl(this.country)
     }
 
     static get observedAttributes() { return ["country"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         // name will always be "country" due to observedAttributes
-        this._countryCode = newValue;
     }
     connectedCallback() {
         
@@ -55,12 +56,7 @@ export class FlagIcon extends HTMLElement {
         defaultValue: 'us',
     })
     public country: string = 'us';
-    // get country() : string{
-    //     return this._countryCode;
-    // }
-    // set country(v: string) {
-    //     this.setAttribute("country", v);
-    // }
+    
 
     [country_change_handler](newVal: string, oldVal: string){
 

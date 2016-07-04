@@ -32,24 +32,19 @@ class FlagIcon extends HTMLElement {
         super();
         //@Reflect.metadata('polymer-notify', true)
         this.country = 'us';
-        this._countryCode = null;
+    }
+    computeCountryCodeImgUrl(countryCode) {
+        return this._countryCodeToImgUrlLookup[countryCode];
     }
     get countryCodeImgUrl() {
-        return this._countryCodeToImgUrlLookup[this._countryCode];
+        return this.computeCountryCodeImgUrl(this.country);
     }
     static get observedAttributes() { return ["country"]; }
     attributeChangedCallback(name, oldValue, newValue) {
         // name will always be "country" due to observedAttributes
-        this._countryCode = newValue;
     }
     connectedCallback() {
     }
-    // get country() : string{
-    //     return this._countryCode;
-    // }
-    // set country(v: string) {
-    //     this.setAttribute("country", v);
-    // }
     [country_change_handler](newVal, oldVal) {
     }
     get CountryClickHandler() {
@@ -57,6 +52,10 @@ class FlagIcon extends HTMLElement {
         };
     }
 }
+__decorate([
+    rt.toProp(), 
+    __metadata('design:type', String)
+], FlagIcon.prototype, "countryCodeImgUrl", null);
 __decorate([
     rt.toProp({
         polymer_observer: country_change_handler,
