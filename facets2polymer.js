@@ -107,6 +107,7 @@ function processFACETSFileClass(className, facetsFile) {
             const methodInfo = {
                 name: propName,
                 value: propDescriptor.value,
+                functionStr: propDescriptor.value.toString().replace(propName, 'function')
             };
             methods.push(methodInfo);
         }
@@ -115,16 +116,14 @@ function processFACETSFileClass(className, facetsFile) {
     const polymerPrototypeString = `
     Polymer({
         is: '${tagName}',
-        properties: {                           ${properties.map(property => `
-            ${property.name}:{                      ${property.type ? `
+        properties: {                               ${properties.map(property => `
+            ${property.name}:{                          ${property.type ? `
                 type: ${property.type},` : ''}
-                                                    ${property.metadata.map(nvp => `
+                                                        ${property.metadata.map(nvp => `
                 ${nvp.name}: ${nvp.value}`)}
             }`)}
-        },
-                                                ${methods.map(method => `
-        ${method.name}: ${method.value.toString().replace(method.name, 'function')}
-        `)}
+        },                                          ${methods.map(method => `
+        ${method.name}: ${method.functionStr}`)}
     });
     `;
     console.log(polymerPrototypeString);
