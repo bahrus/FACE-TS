@@ -15,7 +15,7 @@ const country_change_handler = 'country_change_handler';
 exports.FlagIconTemplate = (flag_icon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
-        onclick="${flag_icon.CountryClickHandler}">
+        onclick="${flag_icon.countryClickHandler()}">
     </div>
     <div>NickNames:</div>
     <ul>
@@ -46,10 +46,10 @@ class FlagIcon extends HTMLElement {
     connectedCallback() {
     }
     [country_change_handler](newVal, oldVal) {
+        //country change handler
     }
-    get CountryClickHandler() {
-        return function (e) {
-        };
+    countryClickHandler() {
+        //on click handler
     }
 }
 __decorate([

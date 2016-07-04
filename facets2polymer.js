@@ -31,22 +31,20 @@ function processFACETSFileTemplate(filePath) {
     tokensEvaluated = `
     <dom id="${domID}">
         ${tokensEvaluated}
+        <script>
+            ${processFACETSFileClass(fileName, facetsFile)}
+        </script>
     </dom>`;
-    //console.log(tokensEvaluated);
-    processFACETSFileClass(fileName, facetsFile);
+    console.log(tokensEvaluated);
 }
 function processFACETSFileClass(className, facetsFile) {
     const classDef = facetsFile[className];
-    console.log(classDef);
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
-    console.log(Object.keys(classProto));
-    console.log(propNames);
     const properties = [];
     const methods = [];
     for (let i = 0, ii = propNames.length; i < ii; i++) {
         const propName = propNames[i];
-        //console.log(propName);
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if (propDescriptor.get) {
             const propertyInfo = {
@@ -126,7 +124,7 @@ function processFACETSFileClass(className, facetsFile) {
         ${method.name}: ${method.functionStr}`)}
     });
     `;
-    console.log(polymerPrototypeString);
+    return polymerPrototypeString;
 }
 function toSnakeCase(s) {
     return s.replace(/([A-Z])/g, ($1, a, idx) => {
@@ -232,13 +230,15 @@ function populateAttributes(nodeElement, templateTokenPair) {
                     }
                 }
                 let newKey;
+                let newVal = splitPair.join('');
                 if (isEventHandler) {
+                    newVal = newVal.replace('()', '');
                     newKey = 'on-' + key.substr(2);
                 }
                 else {
                     newKey = key + '$';
                 }
-                attribs[newKey] = splitPair.join('');
+                attribs[newKey] = newVal;
                 delete attribs[key];
             }
         }

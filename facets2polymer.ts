@@ -45,10 +45,11 @@ function processFACETSFileTemplate(filePath: string){
     tokensEvaluated = `
     <dom id="${domID}">
         ${tokensEvaluated}
+        <script>
+            ${processFACETSFileClass(fileName, facetsFile)}
+        </script>
     </dom>`;
-    //console.log(tokensEvaluated);
-    processFACETSFileClass(fileName, facetsFile);
-    
+    console.log(tokensEvaluated);
 }
 interface INameValuePair{
     name: string;
@@ -69,19 +70,15 @@ interface IMethodInfo{
     functionStr: string;
 }
 
-function processFACETSFileClass(className: string, facetsFile: any){
+function processFACETSFileClass(className: string, facetsFile: any) : string{
     
     const classDef = facetsFile[className];
-    console.log(classDef);
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
-    console.log(Object.keys(classProto));
-    console.log(propNames);
     const properties : IPropertyInfo[]  = [];
     const methods : IMethodInfo[]  = [];
     for(let i = 0, ii = propNames.length; i < ii; i++){
         const propName = propNames[i];
-        //console.log(propName);
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if(propDescriptor.get){
                 const propertyInfo : IPropertyInfo = {
@@ -160,7 +157,7 @@ function processFACETSFileClass(className: string, facetsFile: any){
         ${method.name}: ${method.functionStr}`      )}
     });
     `;
-    console.log(polymerPrototypeString);
+    return polymerPrototypeString;
 }
 function toSnakeCase(s: string){
 	return s.replace(/([A-Z])/g, ($1, a, idx) => {
@@ -270,12 +267,15 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
                     }    
                 }
                 let newKey: string;
+                let newVal = splitPair.join('');
                 if(isEventHandler){
+                    newVal = newVal.replace('()', '');
                     newKey = 'on-' + key.substr(2);
                 }else{
                     newKey = key + '$';
+
                 }
-                attribs[newKey] = splitPair.join('');
+                attribs[newKey] = newVal;
                 delete attribs[key];
             }
             
