@@ -1,11 +1,13 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
+///<reference path="Scripts/typings/node/node.d.ts"/>
 "use strict"
 
 declare var require;
 //const esprima = require('esprima');
 import cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
-const path = require('path');
+import path = require('path');
+import fs = require('fs');
 const process = require('process');
 //const filePath = './Tests/FlagIcon';
 const filePath = process.argv[2];
@@ -20,8 +22,11 @@ export interface IPair{
 }
 
 //var flagIcon = require(filePath);
-processFACETSFileTemplate(filePath);
+const outputS = processFACETSFileTemplate(filePath);
+const resolvedFilePath = path.resolve(filePath);
+const outputFilePath = resolvedFilePath + '.html';
 
+fs.writeFileSync(outputFilePath, outputS, {encoding: 'utf8'});
 
 function processFACETSFileTemplate(filePath: string){
     const facetsFile = require(filePath);
@@ -51,7 +56,7 @@ function processFACETSFileTemplate(filePath: string){
             ${processFACETSFileClass(fileName, facetsFile)}
         </script>
     </dom>`;
-    console.log(tokensEvaluated);
+    return tokensEvaluated;
 }
 interface INameValuePair{
     name: string;

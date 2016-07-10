@@ -1,15 +1,20 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
+///<reference path="Scripts/typings/node/node.d.ts"/>
 "use strict";
 //const esprima = require('esprima');
 var cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
-const path = require('path');
+var path = require('path');
+var fs = require('fs');
 const process = require('process');
 //const filePath = './Tests/FlagIcon';
 const filePath = process.argv[2];
 var rt = require('./om');
 //var flagIcon = require(filePath);
-processFACETSFileTemplate(filePath);
+const outputS = processFACETSFileTemplate(filePath);
+const resolvedFilePath = path.resolve(filePath);
+const outputFilePath = resolvedFilePath + '.html';
+fs.writeFileSync(outputFilePath, outputS, { encoding: 'utf8' });
 function processFACETSFileTemplate(filePath) {
     const facetsFile = require(filePath);
     const fileName = path.basename(filePath);
@@ -37,7 +42,7 @@ function processFACETSFileTemplate(filePath) {
             ${processFACETSFileClass(fileName, facetsFile)}
         </script>
     </dom>`;
-    console.log(tokensEvaluated);
+    return tokensEvaluated;
 }
 function processFACETSFileClass(className, facetsFile) {
     const reNewLine = new RegExp('\n', 'g');
