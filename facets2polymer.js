@@ -4,7 +4,9 @@
 var cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
-const filePath = './Tests/FlagIcon';
+const process = require('process');
+//const filePath = './Tests/FlagIcon';
+const filePath = process.argv[2];
 var rt = require('./om');
 //var flagIcon = require(filePath);
 processFACETSFileTemplate(filePath);

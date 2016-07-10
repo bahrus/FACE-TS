@@ -6,7 +6,9 @@ declare var require;
 import cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
-const filePath = './Tests/FlagIcon';
+const process = require('process');
+//const filePath = './Tests/FlagIcon';
+const filePath = process.argv[2];
 import rt = require('./om');
 
 //import flagIcon = require(filePath);
