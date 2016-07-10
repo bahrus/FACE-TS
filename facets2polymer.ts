@@ -7,7 +7,7 @@ import cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
-import rt = require('./@rt');
+import rt = require('./om');
 
 //import flagIcon = require(filePath);
 //import flagIcon = require('./Tests/FlagIcon');
@@ -71,7 +71,7 @@ interface IMethodInfo{
 }
 
 function processFACETSFileClass(className: string, facetsFile: any) : string{
-    
+    const reNewLine = new RegExp('\n', 'g');
     const classDef = facetsFile[className];
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
@@ -134,10 +134,11 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
         }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
             //debugger;
             if(propName === 'constructor') continue;
+            let functionStr = propDescriptor.value.toString().replace(propName, 'function').replace(reNewLine, '\n    ');
             const methodInfo: IMethodInfo = {
                 name: propName,
                 value: propDescriptor.value,
-                functionStr: propDescriptor.value.toString().replace(propName, 'function')
+                functionStr: functionStr,
             };
             methods.push(methodInfo);
         }

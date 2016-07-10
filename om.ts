@@ -1,11 +1,11 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
-const __rt = '__@rt';
+const __om = '__@om';
 export const WebComponentProps = 'WebComponentProps';
 export const ComputedRelationship = 'ComputedRelationship';
 const getter = function(ID: string, defaultValue?: any){
     return function(){
-        const lu = this[__rt];
+        const lu = this[__om];
         if(!lu) return defaultValue;
         return lu[ID];
     }
@@ -13,10 +13,10 @@ const getter = function(ID: string, defaultValue?: any){
 
 const setter = function(ID: string){
 	return function(val){
-		let lu = this[__rt];
+		let lu = this[__om];
 		if(!lu){
 			lu = [];
-			this[__rt] = lu;
+			this[__om] = lu;
 		}
 		lu[ID] = val;
 	}

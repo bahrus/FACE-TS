@@ -9,9 +9,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-require('reflect-metadata/Reflect');
-var rt = require('../@rt');
+var om = require('../om');
 const country_change_handler = 'country_change_handler';
+const test = 'test';
 exports.FlagIconTemplate = (flag_icon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
@@ -30,7 +30,6 @@ class HTMLElement {
 class FlagIcon extends HTMLElement {
     constructor() {
         super();
-        //@Reflect.metadata('polymer-notify', true)
         this.country = 'us';
     }
     computeCountryCodeImgUrl(countryCode) {
@@ -53,11 +52,11 @@ class FlagIcon extends HTMLElement {
     }
 }
 __decorate([
-    rt.toProp(), 
+    om.toProp(), 
     __metadata('design:type', String)
 ], FlagIcon.prototype, "countryCodeImgUrl", null);
 __decorate([
-    rt.toProp({
+    om.toProp({
         polymer_observer: country_change_handler,
         defaultValue: 'us',
     }), 

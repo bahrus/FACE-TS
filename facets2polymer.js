@@ -5,7 +5,7 @@ var cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 const path = require('path');
 const filePath = './Tests/FlagIcon';
-var rt = require('./@rt');
+var rt = require('./om');
 //var flagIcon = require(filePath);
 processFACETSFileTemplate(filePath);
 function processFACETSFileTemplate(filePath) {
@@ -38,6 +38,7 @@ function processFACETSFileTemplate(filePath) {
     console.log(tokensEvaluated);
 }
 function processFACETSFileClass(className, facetsFile) {
+    const reNewLine = new RegExp('\n', 'g');
     const classDef = facetsFile[className];
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
@@ -102,10 +103,11 @@ function processFACETSFileClass(className, facetsFile) {
             //debugger;
             if (propName === 'constructor')
                 continue;
+            let functionStr = propDescriptor.value.toString().replace(propName, 'function').replace(reNewLine, '\n    ');
             const methodInfo = {
                 name: propName,
                 value: propDescriptor.value,
-                functionStr: propDescriptor.value.toString().replace(propName, 'function')
+                functionStr: functionStr,
             };
             methods.push(methodInfo);
         }

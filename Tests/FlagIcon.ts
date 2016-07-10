@@ -2,10 +2,11 @@
 
 "use strict"
 declare var require;
-require('reflect-metadata/Reflect');
-import rt = require('../@rt');
+import om = require('../om');
 
 const country_change_handler = 'country_change_handler';
+
+const test = 'test';
 export const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
@@ -36,10 +37,12 @@ export class FlagIcon extends HTMLElement {
     computeCountryCodeImgUrl(countryCode){
         return this._countryCodeToImgUrlLookup[countryCode];
     }
-    @rt.toProp()
+    @om.toProp()
     get countryCodeImgUrl() : string{
         return this.computeCountryCodeImgUrl(this.country)
     }
+
+    
 
     static get observedAttributes() { return ["country"]; }
 
@@ -50,8 +53,7 @@ export class FlagIcon extends HTMLElement {
         
     }
 
-    //@Reflect.metadata('polymer-notify', true)
-    @rt.toProp({
+    @om.toProp({
         polymer_observer: country_change_handler,
         defaultValue: 'us',
     })
@@ -67,3 +69,5 @@ export class FlagIcon extends HTMLElement {
     }
 
 }
+
+
