@@ -1,4 +1,5 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
+///<reference path="Scripts/typings/cheerio/cheerio.d.ts"/>
 ///<reference path="Scripts/typings/node/node.d.ts"/>
 "use strict";
 //const esprima = require('esprima');
@@ -54,9 +55,7 @@ function processFACETSFileClass(className, facetsFile) {
     const propNames = Object.getOwnPropertyNames(classProto);
     const properties = [];
     const methods = [];
-    //for(let i = 0, ii = propNames.length; i < ii; i++){
     for (const propName of propNames) {
-        //const propName = propNames[i];
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if (propDescriptor.get) {
             const propertyInfo = {
@@ -170,10 +169,9 @@ function parseNodeElement(nodeElement, templateTokenPair, parent, $) {
     const children = nodeElement.children;
     if (!children)
         return;
-    for (let i = 0, ii = children.length; i < ii; i++) {
-        const child = children[i];
+    children.forEach(child => {
         parseNodeElement(child, templateTokenPair, nodeElement, $);
-    }
+    });
 }
 function parseNode($node, $) {
     const templateTokenPair = {

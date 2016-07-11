@@ -1,4 +1,5 @@
 //<reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
+///<reference path="Scripts/typings/cheerio/cheerio.d.ts"/>
 ///<reference path="Scripts/typings/node/node.d.ts"/>
 "use strict"
 
@@ -88,9 +89,7 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
     const propNames = Object.getOwnPropertyNames(classProto);
     const properties : IPropertyInfo[]  = [];
     const methods : IMethodInfo[]  = [];
-    //for(let i = 0, ii = propNames.length; i < ii; i++){
     for(const propName of propNames){
-        //const propName = propNames[i];
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if(propDescriptor.get){
                 const propertyInfo : IPropertyInfo = {
@@ -199,10 +198,9 @@ function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair
     }
     const children = nodeElement.children;
     if(!children) return;
-    for(let i = 0, ii = children.length; i < ii; i++){
-        const child = children[i];
+    children.forEach(child => {
         parseNodeElement(child, templateTokenPair, nodeElement, $);
-    }
+    });
 }
 
 function parseNode($node:  Cheerio, $: CheerioStatic){
