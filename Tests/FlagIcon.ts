@@ -37,6 +37,7 @@ export class FlagIcon extends HTMLElement {
     computeCountryCodeImgUrl(countryCode){
         return this._countryCodeToImgUrlLookup[countryCode];
     }
+    
     @om.toProp()
     get countryCodeImgUrl() : string{
         return this.computeCountryCodeImgUrl(this.country)

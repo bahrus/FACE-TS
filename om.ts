@@ -23,9 +23,23 @@ const setter = function(ID: string){
 }
 
 export interface IPropertyProps{
+	/**
+	 * Default value for the property. If value is a function, the function is invoked and the return value is used as the default value of the property. If the default value should be an array or object unique to the instance, create the array or object inside a function. See Configuring default property values for more information.
+	 */
 	defaultValue?: any;
+	/**
+	 * If true, the property is available for two-way data binding. In addition, an event, property-name-changed is fired whenever the property changes. See Property change notification events (notify) for more information.
+	 */
 	polymer_notify?: boolean;
+	/**
+	 * The value is interpreted as a method name to be invoked when the property value changes. Note that unlike in 0.5, property change handlers must be registered explicitly. The propertyNameChanged method will not be invoked automatically. See Property change callbacks (observers) for more information.
+	 */
 	polymer_observer?: string; 
+
+	/**
+	 * If true, the property can't be set directly by assignment or data binding.
+	 */
+	polymer_readOnly?: boolean;
 }
 
 export interface IComputedPropInfo{
