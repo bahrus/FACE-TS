@@ -50,7 +50,7 @@ export class FlagIcon extends HTMLElement {
         // name will always be "country" due to observedAttributes
     }
     connectedCallback() {
-        
+        //connectedCallback
     }
 
     @om.toProp({

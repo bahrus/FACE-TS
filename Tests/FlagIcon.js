@@ -43,6 +43,7 @@ class FlagIcon extends HTMLElement {
         // name will always be "country" due to observedAttributes
     }
     connectedCallback() {
+        //connectedCallback
     }
     [country_change_handler](newVal, oldVal) {
         //country change handler

@@ -1,5 +1,6 @@
 
     <dom id="flag-icon">
+        <template>
         
     <div>
         <img src$="{{countryCodeImgUrl}}" on-click="countryClickHandler">
@@ -7,6 +8,7 @@
     <div>NickNames:</div>
     <ul><template is="dom-repeat" items="{{nickNames}}"><li>NickName: ${nickName}</li></template></ul>
 
+        </template>
         <script>
             
     Polymer({
@@ -30,7 +32,8 @@
         attributeChangedCallback: function(name, oldValue, newValue) {
             // name will always be "country" due to observedAttributes
         },
-        connectedCallback: function() {
+        ready: function() {
+            //connectedCallback
         },
         country_change_handler: (newVal, oldVal) {
             //country change handler

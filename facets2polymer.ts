@@ -51,7 +51,9 @@ function processFACETSFileTemplate(filePath: string){
     const domID  = toSnakeCase(fileName); //TODO
     tokensEvaluated = `
     <dom id="${domID}">
+        <template>
         ${tokensEvaluated}
+        </template>
         <script>
             ${processFACETSFileClass(fileName, facetsFile)}
         </script>
@@ -139,11 +141,13 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
                 properties.push(propertyInfo);
                 //console.log(propDescriptor.get.toString());
         }else if(propDescriptor.value && typeof(propDescriptor.value) === 'function'){
-            //debugger;
+            //method;
             if(propName === 'constructor') continue;
             let functionStr = propDescriptor.value.toString().replace(propName, 'function').replace(reNewLine, '\n    ');
+            let methodName = propName;
+            if(methodName === 'connectedCallback') methodName = 'ready';
             const methodInfo: IMethodInfo = {
-                name: propName,
+                name: methodName,
                 value: propDescriptor.value,
                 functionStr: functionStr,
             };
