@@ -40,6 +40,11 @@ export interface IPropertyProps{
 	 * If true, the property can't be set directly by assignment or data binding.
 	 */
 	polymer_readOnly?: boolean;
+
+	/**
+	 * Set to true to cause the corresponding attribute to be set on the host node when the property value changes. If the property value is Boolean, the attribute is created as a standard HTML boolean attribute (set if true, not set if false). For other property types, the attribute value is a string representation of the property value. Equivalent to reflect in Polymer 0.5. See Reflecting properties to attributes for more information.
+	 */
+	polymer_reflectToAttribute?: boolean;
 }
 
 export interface IComputedPropInfo{

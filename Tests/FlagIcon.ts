@@ -57,6 +57,7 @@ export class FlagIcon extends HTMLElement {
     @om.toProp({
         polymer_observer: country_change_handler,
         defaultValue: 'us',
+        polymer_readOnly: true,
     })
     public country: string = 'us';
     

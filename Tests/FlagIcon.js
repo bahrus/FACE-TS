@@ -60,6 +60,7 @@ __decorate([
     om.toProp({
         polymer_observer: country_change_handler,
         defaultValue: 'us',
+        polymer_readOnly: true,
     }), 
     __metadata('design:type', String)
 ], FlagIcon.prototype, "country", void 0);
