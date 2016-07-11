@@ -10,6 +10,7 @@ const process = require('process');
 //const filePath = './Tests/FlagIcon';
 const filePath = process.argv[2];
 var rt = require('./om');
+//#endregion
 //var flagIcon = require(filePath);
 const outputS = processFACETSFileTemplate(filePath);
 const resolvedFilePath = path.resolve(filePath);
@@ -53,8 +54,9 @@ function processFACETSFileClass(className, facetsFile) {
     const propNames = Object.getOwnPropertyNames(classProto);
     const properties = [];
     const methods = [];
-    for (let i = 0, ii = propNames.length; i < ii; i++) {
-        const propName = propNames[i];
+    //for(let i = 0, ii = propNames.length; i < ii; i++){
+    for (const propName of propNames) {
+        //const propName = propNames[i];
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if (propDescriptor.get) {
             const propertyInfo = {

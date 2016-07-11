@@ -15,12 +15,31 @@ import rt = require('./om');
 
 //import flagIcon = require(filePath);
 //import flagIcon = require('./Tests/FlagIcon');
-
+//#region
 export interface IPair{
     lhs: string;
     rhs: string;
 }
 
+interface INameValuePair{
+    name: string;
+    value: string;
+}
+
+interface IPropertyInfo {
+    name: string;
+    propertyDescriptor: PropertyDescriptor;
+    //metadata: {[key: string]: string};
+    metadata: INameValuePair[];
+    type?: any;
+}
+
+interface IMethodInfo{
+    name: string;
+    value: any;
+    functionStr: string;
+}
+//#endregion
 //var flagIcon = require(filePath);
 const outputS = processFACETSFileTemplate(filePath);
 const resolvedFilePath = path.resolve(filePath);
@@ -60,24 +79,7 @@ function processFACETSFileTemplate(filePath: string){
     </dom>`;
     return tokensEvaluated;
 }
-interface INameValuePair{
-    name: string;
-    value: string;
-}
 
-interface IPropertyInfo {
-    name: string;
-    propertyDescriptor: PropertyDescriptor;
-    //metadata: {[key: string]: string};
-    metadata: INameValuePair[];
-    type?: any;
-}
-
-interface IMethodInfo{
-    name: string;
-    value: any;
-    functionStr: string;
-}
 
 function processFACETSFileClass(className: string, facetsFile: any) : string{
     const reNewLine = new RegExp('\n', 'g');
@@ -86,8 +88,9 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
     const propNames = Object.getOwnPropertyNames(classProto);
     const properties : IPropertyInfo[]  = [];
     const methods : IMethodInfo[]  = [];
-    for(let i = 0, ii = propNames.length; i < ii; i++){
-        const propName = propNames[i];
+    //for(let i = 0, ii = propNames.length; i < ii; i++){
+    for(const propName of propNames){
+        //const propName = propNames[i];
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if(propDescriptor.get){
                 const propertyInfo : IPropertyInfo = {
