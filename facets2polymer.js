@@ -178,10 +178,9 @@ function parseNode($node, $) {
         lhs: '${',
         rhs: '}'
     };
-    for (let i = 0, ii = $node.length; i < ii; i++) {
-        const node = $node[i];
+    $node.each((idx, node) => {
         parseNodeElement(node, templateTokenPair, null, $);
-    }
+    });
 }
 function splitPairs(text, pair) {
     const returnObj = [];

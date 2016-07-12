@@ -208,10 +208,10 @@ function parseNode($node:  Cheerio, $: CheerioStatic){
         lhs: '${',
         rhs: '}'
     };
-    for(let i = 0, ii = $node.length; i< ii; i++){
-        const node = $node[i];
-        parseNodeElement(node, templateTokenPair, null, $);       
-    }
+    $node.each((idx, node) =>{
+        parseNodeElement(node, templateTokenPair, null, $);
+    })
+    
     
     
 }
