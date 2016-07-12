@@ -264,10 +264,9 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
             let val = attribs[key] as string;
             const splitPair = splitPairs(val, templateTokenPair);
             if(splitPair.length > 1){
-                //const newValTokens = [];
                 const isEventHandler = key.startsWith('on');
-                for(let i = 0, ii = splitPair.length; i < ii; i++){
-                    const token = splitPair[i];
+                const ii = splitPair.length;
+                splitPair.forEach((token, i) =>{
                     if(token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs){
                         splitPair[i] = isEventHandler ? '' : '{{';
                         let val2 = splitPair[i + 1];
@@ -277,8 +276,8 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
                             splitPair[i + 1] = val2;
                         }
                         splitPair[i + 2] = isEventHandler ? '' : '}}';
-                    }    
-                }
+                    }
+                });
                 let newKey: string;
                 let newVal = splitPair.join('');
                 if(isEventHandler){

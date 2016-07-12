@@ -227,10 +227,9 @@ function populateAttributes(nodeElement, templateTokenPair) {
             let val = attribs[key];
             const splitPair = splitPairs(val, templateTokenPair);
             if (splitPair.length > 1) {
-                //const newValTokens = [];
                 const isEventHandler = key.startsWith('on');
-                for (let i = 0, ii = splitPair.length; i < ii; i++) {
-                    const token = splitPair[i];
+                const ii = splitPair.length;
+                splitPair.forEach((token, i) => {
                     if (token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs) {
                         splitPair[i] = isEventHandler ? '' : '{{';
                         let val2 = splitPair[i + 1];
@@ -241,7 +240,7 @@ function populateAttributes(nodeElement, templateTokenPair) {
                         }
                         splitPair[i + 2] = isEventHandler ? '' : '}}';
                     }
-                }
+                });
                 let newKey;
                 let newVal = splitPair.join('');
                 if (isEventHandler) {
