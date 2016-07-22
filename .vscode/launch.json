@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/facets2polymer.js",
             "stopOnEntry": false,
-            "args": ["./Tests/FlagIcon"],
+            "args": ["./Tests/FlagIconVM"],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": null,
             "runtimeExecutable": null,

@@ -3,7 +3,7 @@
 ///<reference path="Scripts/typings/node/node.d.ts"/>
 "use strict"
 
-declare var require;
+//declare var require;
 //const esprima = require('esprima');
 import cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
@@ -12,37 +12,14 @@ import fs = require('fs');
 const process = require('process');
 //const filePath = './Tests/FlagIcon';
 const filePath = process.argv[2];
-import rt = require('./om');
+import bt = require('./bt');
 
 //import flagIcon = require(filePath);
 //import flagIcon = require('./Tests/FlagIcon');
-//#region
-export interface IPair{
-    lhs: string;
-    rhs: string;
-}
 
-interface INameValuePair{
-    name: string;
-    value: string;
-}
-
-interface IPropertyInfo {
-    name: string;
-    propertyDescriptor: PropertyDescriptor;
-    //metadata: {[key: string]: string};
-    metadata: INameValuePair[];
-    type?: any;
-}
-
-interface IMethodInfo{
-    name: string;
-    value: any;
-    functionStr: string;
-}
-//#endregion
 //var flagIcon = require(filePath);
 const outputS = processFACETSFileTemplate(filePath);
+
 const resolvedFilePath = path.resolve(filePath);
 const outputFilePath = resolvedFilePath + '.html';
 
@@ -53,32 +30,38 @@ function processFACETSFileTemplate(filePath: string){
     const fileName = path.basename(filePath);
     const templateName = fileName + "Template"; 
     const templateFnString = facetsFile[templateName].toString();
-    const templateHTML = `<template>
-        ${templateFnString}
-    </template>`;
-    const $ = cheerio.load(templateHTML);
-    parseNode($.root(), $);
-    let tokensEvaluated = $.root().html();
-    //debugger;
-    tokensEvaluated = tokensEvaluated.substr('<template>'.length);
-    tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
-    const arrowFunction = /=&gt;/g;
-    tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
-    const joinAposApos = /&apos;&apos;/g;
-    tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
-    tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    const test = bt.generateTemplateAbstractSyntaxTree(templateFnString);
+    const test2 = test.html(); 
+    console.log(test2);
     
-    const domID  = toSnakeCase(fileName); //TODO
-    tokensEvaluated = `
-    <dom id="${domID}">
-        <template>
-        ${tokensEvaluated}
-        </template>
-        <script>
-            ${processFACETSFileClass(fileName, facetsFile)}
-        </script>
-    </dom>`;
-    return tokensEvaluated;
+    // const templateHTML = `<template>
+    //     ${templateFnString}
+    // </template>`;
+
+    // const $ = cheerio.load(templateHTML);
+    // parseNode($.root(), $);
+    // let tokensEvaluated = $.root().html();
+    // //debugger;
+    // tokensEvaluated = tokensEvaluated.substr('<template>'.length);
+    // tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
+    // const arrowFunction = /=&gt;/g;
+    // tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
+    // const joinAposApos = /&apos;&apos;/g;
+    // tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
+    // tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    
+    // const domID  = toSnakeCase(fileName); //TODO
+    // tokensEvaluated = `
+    // <link rel="import" href="bower_components/polymer/polymer.html"/>
+    // <dom id="${domID}">
+    //     <template>
+    //     ${tokensEvaluated}
+    //     </template>
+    //     <script>
+    //         ${processFACETSFileClass(fileName, facetsFile)}
+    //     </script>
+    // </dom>`;
+    // return tokensEvaluated;
 }
 
 
@@ -87,12 +70,12 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
     const classDef = facetsFile[className];
     const classProto = classDef.prototype;
     const propNames = Object.getOwnPropertyNames(classProto);
-    const properties : IPropertyInfo[]  = [];
-    const methods : IMethodInfo[]  = [];
+    const properties : bt.IPropertyInfo[]  = [];
+    const methods : bt.IMethodInfo[]  = [];
     for(const propName of propNames){
         const propDescriptor = Object.getOwnPropertyDescriptor(classProto, propName);
         if(propDescriptor.get){
-                const propertyInfo : IPropertyInfo = {
+                const propertyInfo : bt.IPropertyInfo = {
                     propertyDescriptor: propDescriptor,
                     metadata:[],
                     name:propName,
@@ -106,13 +89,13 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
                     const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
                     propertyInfo.type = typeSigWOParenthesis;
                 }
-                const webComponentProps = Reflect.getMetadata( rt.WebComponentProps, classProto, propName) as rt.IPropertyProps;
+                const webComponentProps = Reflect.getMetadata( bt.WebComponentProps, classProto, propName) as bt.IPropertyProps;
                 if(webComponentProps){
                     for(var key in webComponentProps){
                         const polymerPref = 'polymer_'
                         if(!key.startsWith(polymerPref)) continue;
                         const actualKey = key.substr(polymerPref.length);
-                        const metaPair : INameValuePair = {
+                        const metaPair : bt.INameValuePair = {
                             name: actualKey,
                             value: webComponentProps[key],
                         };
@@ -123,18 +106,18 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
                         if(propertyInfo.type === 'String'){
                             defaultValue = `'${defaultValue}'`;
                         }
-                        const metaPair: INameValuePair = {
+                        const metaPair: bt.INameValuePair = {
                             name: 'value',
                             value: defaultValue,
                         }
                         propertyInfo.metadata.push(metaPair);
                     }
                 }
-                const computedProp = Reflect.getMetadata(rt.ComputedRelationship, classProto, propName) as rt.IComputedPropInfo;
+                const computedProp = Reflect.getMetadata(bt.ComputedRelationship, classProto, propName) as bt.IComputedPropInfo;
                 if(computedProp){
                     const polymerArgList = computedProp.argList.map(s => s.replace('this.', ''));
                     const polymerArgString = polymerArgList.join();
-                    const metaPair: INameValuePair = {
+                    const metaPair: bt.INameValuePair = {
                         name: 'computed',
                         value: `${computedProp.computedMethodName}(${polymerArgString})`,
                     }
@@ -148,7 +131,7 @@ function processFACETSFileClass(className: string, facetsFile: any) : string{
             let functionStr = propDescriptor.value.toString().replace(propName, 'function').replace(reNewLine, '\n    ');
             let methodName = propName;
             if(methodName === 'connectedCallback') methodName = 'ready';
-            const methodInfo: IMethodInfo = {
+            const methodInfo: bt.IMethodInfo = {
                 name: methodName,
                 value: propDescriptor.value,
                 functionStr: functionStr,
@@ -189,7 +172,7 @@ function trimOutside(s: string, start: string, end?: string) : string {
     if(iPosOfEnd === -1) return s.substr(iPosOfStart + start.length);
     return s.substring(iPosOfStart + start.length, iPosOfEnd);
 }
-function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement, $: CheerioStatic){
+function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: bt.IPair, parent: CheerioElement, $: CheerioStatic){
     if(!nodeElement) return;
     if(nodeElement.type==='text'){
         populateTextNode(nodeElement, templateTokenPair, parent, $);
@@ -203,20 +186,9 @@ function parseNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPair
     });
 }
 
-function parseNode($node:  Cheerio, $: CheerioStatic){
-    const templateTokenPair: IPair = {
-        lhs: '${',
-        rhs: '}'
-    };
-    $node.each((idx, node) =>{
-        parseNodeElement(node, templateTokenPair, null, $);
-    })
-    
-    
-    
-}
 
-function splitPairs(text: string, pair: IPair): string[]{
+
+function splitPairs(text: string, pair: bt.IPair): string[]{
     const returnObj: string[] = [];
     let region: string[] = [];
     const lhsFirstChr = pair.lhs.substr(0, 1);
@@ -257,7 +229,18 @@ function splitPairs(text: string, pair: IPair): string[]{
     return returnObj;
 }
 
-function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPair){
+function parseNode($node:  Cheerio, $: CheerioStatic){
+    const templateTokenPair: bt.IPair = {
+        lhs: '${',
+        rhs: '}'
+    };
+    $node.each((idx, node) =>{
+        parseNodeElement(node, templateTokenPair, null, $);
+    })
+    
+}
+
+function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: bt.IPair){
     const attribs = nodeElement.attribs;
     if(attribs){
         for(let key in attribs){
@@ -296,7 +279,7 @@ function populateAttributes(nodeElement:  CheerioElement, templateTokenPair: IPa
 
 }
 
-function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement, $: CheerioStatic){
+function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: bt.IPair, parent: CheerioElement, $: CheerioStatic){
     if(parent.children.length !== 1) {
         const text = nodeElement['data'] as string;
         const lines = text.split('\n');

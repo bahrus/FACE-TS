@@ -2,16 +2,15 @@
 ///<reference path="Scripts/typings/cheerio/cheerio.d.ts"/>
 ///<reference path="Scripts/typings/node/node.d.ts"/>
 "use strict";
-//const esprima = require('esprima');
-var cheerio = require('cheerio');
 require('reflect-metadata/Reflect');
 var path = require('path');
 var fs = require('fs');
 const process = require('process');
 //const filePath = './Tests/FlagIcon';
 const filePath = process.argv[2];
-var rt = require('./om');
-//#endregion
+var bt = require('./bt');
+//import flagIcon = require(filePath);
+//import flagIcon = require('./Tests/FlagIcon');
 //var flagIcon = require(filePath);
 const outputS = processFACETSFileTemplate(filePath);
 const resolvedFilePath = path.resolve(filePath);
@@ -22,31 +21,35 @@ function processFACETSFileTemplate(filePath) {
     const fileName = path.basename(filePath);
     const templateName = fileName + "Template";
     const templateFnString = facetsFile[templateName].toString();
-    const templateHTML = `<template>
-        ${templateFnString}
-    </template>`;
-    const $ = cheerio.load(templateHTML);
-    parseNode($.root(), $);
-    let tokensEvaluated = $.root().html();
-    //debugger;
-    tokensEvaluated = tokensEvaluated.substr('<template>'.length);
-    tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
-    const arrowFunction = /=&gt;/g;
-    tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
-    const joinAposApos = /&apos;&apos;/g;
-    tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
-    tokensEvaluated = trimOutside(tokensEvaluated, '`');
-    const domID = toSnakeCase(fileName); //TODO
-    tokensEvaluated = `
-    <dom id="${domID}">
-        <template>
-        ${tokensEvaluated}
-        </template>
-        <script>
-            ${processFACETSFileClass(fileName, facetsFile)}
-        </script>
-    </dom>`;
-    return tokensEvaluated;
+    const test = bt.generateTemplateAbstractSyntaxTree(templateFnString);
+    const test2 = test.html();
+    console.log(test2);
+    // const templateHTML = `<template>
+    //     ${templateFnString}
+    // </template>`;
+    // const $ = cheerio.load(templateHTML);
+    // parseNode($.root(), $);
+    // let tokensEvaluated = $.root().html();
+    // //debugger;
+    // tokensEvaluated = tokensEvaluated.substr('<template>'.length);
+    // tokensEvaluated = tokensEvaluated.substr(0, tokensEvaluated.length - '</template>'.length);
+    // const arrowFunction = /=&gt;/g;
+    // tokensEvaluated = tokensEvaluated.replace(arrowFunction, '=>');
+    // const joinAposApos = /&apos;&apos;/g;
+    // tokensEvaluated = tokensEvaluated.replace(joinAposApos, "''");
+    // tokensEvaluated = trimOutside(tokensEvaluated, '`');
+    // const domID  = toSnakeCase(fileName); //TODO
+    // tokensEvaluated = `
+    // <link rel="import" href="bower_components/polymer/polymer.html"/>
+    // <dom id="${domID}">
+    //     <template>
+    //     ${tokensEvaluated}
+    //     </template>
+    //     <script>
+    //         ${processFACETSFileClass(fileName, facetsFile)}
+    //     </script>
+    // </dom>`;
+    // return tokensEvaluated;
 }
 function processFACETSFileClass(className, facetsFile) {
     const reNewLine = new RegExp('\n', 'g');
@@ -72,7 +75,7 @@ function processFACETSFileClass(className, facetsFile) {
                 const typeSigWOParenthesis = typeSigWOFn.substr(0, iPosOfParent);
                 propertyInfo.type = typeSigWOParenthesis;
             }
-            const webComponentProps = Reflect.getMetadata(rt.WebComponentProps, classProto, propName);
+            const webComponentProps = Reflect.getMetadata(bt.WebComponentProps, classProto, propName);
             if (webComponentProps) {
                 for (var key in webComponentProps) {
                     const polymerPref = 'polymer_';
@@ -97,7 +100,7 @@ function processFACETSFileClass(className, facetsFile) {
                     propertyInfo.metadata.push(metaPair);
                 }
             }
-            const computedProp = Reflect.getMetadata(rt.ComputedRelationship, classProto, propName);
+            const computedProp = Reflect.getMetadata(bt.ComputedRelationship, classProto, propName);
             if (computedProp) {
                 const polymerArgList = computedProp.argList.map(s => s.replace('this.', ''));
                 const polymerArgString = polymerArgList.join();
@@ -173,15 +176,6 @@ function parseNodeElement(nodeElement, templateTokenPair, parent, $) {
         parseNodeElement(child, templateTokenPair, nodeElement, $);
     });
 }
-function parseNode($node, $) {
-    const templateTokenPair = {
-        lhs: '${',
-        rhs: '}'
-    };
-    $node.each((idx, node) => {
-        parseNodeElement(node, templateTokenPair, null, $);
-    });
-}
 function splitPairs(text, pair) {
     const returnObj = [];
     let region = [];
@@ -219,6 +213,15 @@ function splitPairs(text, pair) {
         returnObj.push(region.join(''));
     }
     return returnObj;
+}
+function parseNode($node, $) {
+    const templateTokenPair = {
+        lhs: '${',
+        rhs: '}'
+    };
+    $node.each((idx, node) => {
+        parseNodeElement(node, templateTokenPair, null, $);
+    });
 }
 function populateAttributes(nodeElement, templateTokenPair) {
     const attribs = nodeElement.attribs;

@@ -1,17 +1,21 @@
 ///<reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
+
 "use strict"
 declare var require;
-import om = require('../om');
+import bt = require('../bt');
+import rt = require('../rt');
 
 const country_change_handler = 'country_change_handler';
+const test = Symbol();
 
-const test = 'test';
-export const FlagIconTemplate = (flag_icon: FlagIcon) => `
+//const test = 'test';
+export const FlagIconVMTemplate = (flag_icon: FlagIconVM) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
         onclick="${flag_icon.countryClickHandler()}">
     </div>
+    <span>Hello ${flag_icon.countryCodeImgUrl}</span>
     <div>NickNames:</div>
     <ul>
                                                         ${flag_icon.nickNames.map(nickName =>`
@@ -22,11 +26,20 @@ export const FlagIconTemplate = (flag_icon: FlagIcon) => `
 class HTMLElement{
     setAttribute(name: string, val: string){}
 }
-export class FlagIcon extends HTMLElement {
+
+export class Designer{
+    constructor(public firstName: string, public lastName: string){
+
+    }
+}
+
+
+export class FlagIconVM extends HTMLElement {
 
     
     nickNames: string[];
     
+    designer: Designer;
     
 
     private _countryCodeToImgUrlLookup: {[key: string] : string};
@@ -38,7 +51,7 @@ export class FlagIcon extends HTMLElement {
         return this._countryCodeToImgUrlLookup[countryCode];
     }
     
-    @om.toProp()
+    @bt.toProp()
     get countryCodeImgUrl() : string{
         return this.computeCountryCodeImgUrl(this.country)
     }
@@ -52,9 +65,10 @@ export class FlagIcon extends HTMLElement {
     }
     connectedCallback() {
         //connectedCallback
+        this.designer = new Designer("Jon", "Snow");
     }
 
-    @om.toProp({
+    @bt.toProp({
         polymer_observer: country_change_handler,
         defaultValue: 'us',
         polymer_readOnly: true,
@@ -68,6 +82,7 @@ export class FlagIcon extends HTMLElement {
 
     countryClickHandler(){
         //on click handler
+        this.designer.lastName = 'Stark';
     }
 
 }
