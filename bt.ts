@@ -134,13 +134,13 @@ export function toProp(props?: IPropertyProps){
 }
 
 export function generateTemplateAbstractSyntaxTree(templateFnString: string){
-	const templateHTML = `<template>
+	const templateHTML = `<xsl:template>
         ${templateFnString}
-    </template>`;
+    </xsl:template>`;
     
 	const $ = cheerio.load(templateHTML);
 	processRoot($.root(), $);
-                                                                                                                                                                                                    return $.root();
+    return $.root();
 }
 
 function processRoot($node:  Cheerio, $: CheerioStatic){
@@ -169,12 +169,10 @@ function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair
             const token = splitPair[i];
             if(token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs){
                 splitPair[i] = '<xsl:value-of select="';
-                let val = splitPair[i + 1];
-                const posOfDot = val.indexOf('.');
-                if(posOfDot > -1){
-                    val = val.substr(posOfDot + 1);
-                    splitPair[i + 1] = val;
-                }
+                const val = splitPair[i + 1];
+                const valWithoutHeadToken = removeHeadToken(val, '.');
+                const newVal = replaceAll( valWithoutHeadToken, '.', '/') 
+                splitPair[i + 1] = newVal;
                 splitPair[i + 2] = '"/>';
             }
         }
@@ -215,14 +213,16 @@ function processNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPa
     if(splitMap.length !== 2) return processChildrenFn(); //TODO: deal with other cases
     const listPath0 = splitMap[0];
     const splitPath0 = listPath0.split('${');
+    
     if(splitPath0.length !== 2) return processChildrenFn();
-
+    const pathWithoutHeadToken = removeHeadToken(splitPath0[1], '.');
+    const loopPath = replaceAll( pathWithoutHeadToken, '.', '/');
     //firstChild['data'] = '<hello>';
     //lastChild['data'] = '</hello>';
     const $nodeElement = $(nodeElement);
     const middleChild = children[1];
     processNodeElement(middleChild, templateTokenPair, nodeElement, $);
-    $nodeElement.html(`<xsl:for-each select="${splitPath0[1]}">` + $(middleChild).html() + '</xsl:for-each>');
+    $nodeElement.html(`<xsl:for-each select="${loopPath}">` + $(middleChild).html() + '</xsl:for-each>');
     
 }
 
@@ -233,31 +233,34 @@ function processAttributes(nodeElement:  CheerioElement, templateTokenPair: IPai
 		let val = attribs[key] as string;
 		const splitPair = splitPairs(val, templateTokenPair);
 		if(splitPair.length > 1){
-			const isEventHandler = key.startsWith('on');
+			//const isEventHandler = key.startsWith('on');
 			const ii = splitPair.length;
 			splitPair.forEach((token, i) =>{
 				if(token === templateTokenPair.lhs && i < ii - 2 && splitPair[i + 2] == templateTokenPair.rhs){
-					splitPair[i] = isEventHandler ? '' : '{{';
+					//splitPair[i] = isEventHandler ? '' : '{{';
+                    splitPair[i] = '{';
 					let val2 = splitPair[i + 1];
 					const posOfDot = val2.indexOf('.');
 					if(posOfDot > -1){
 						val2 = val2.substr(posOfDot + 1);
 						splitPair[i + 1] = val2;
 					}
-					splitPair[i + 2] = isEventHandler ? '' : '}}';
+					//splitPair[i + 2] = isEventHandler ? '' : '}}';
+                    splitPair[i + 2] = '}';
 				}
 			});
 			let newKey: string;
 			let newVal = splitPair.join('');
-			if(isEventHandler){
-				newVal = newVal.replace('()', '');
-				newKey = 'on-' + key.substr(2);
-			}else{
-				newKey = key + '$';
+			// if(isEventHandler){
+			// 	newVal = newVal.replace('()', '');
+			// 	newKey = 'on-' + key.substr(2);
+			// }else{
+			// 	newKey = key + '$';
 
-			}
+			// }
+            newKey = key;
 			attribs[newKey] = newVal;
-			delete attribs[key];
+			//delete attribs[key];
 		}
 		
 	}
@@ -303,4 +306,14 @@ function splitPairs(text: string, pair: IPair): string[]{
         returnObj.push(region.join(''));
     }
     return returnObj;
+}
+
+function replaceAll(text: string, oldVal: string, newVal: string){
+    return text.split(oldVal).join(newVal);
+}
+
+function removeHeadToken(text: string, search: string){
+    const iPos = text.indexOf(search);
+    if(iPos == 1) return text;
+    return text.substr(iPos + 1);
 }
