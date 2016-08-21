@@ -216,12 +216,7 @@ function addMemberInfo(returnType: IType, classRefOrClassPrototype: any, isProto
                 }
                 
                 
-                // methodInfo.args = paramNames.map(arg => {
-                    
-                // 	return {
-                // 		name: arg.trim(),
-                // 	}
-                // });
+            
                 if(isPrototype){
                     if(!returnType.methods) returnType.methods = [];
                     returnType.methods.push(methodInfo);
@@ -285,7 +280,6 @@ export function toProp(props?: IPropertyProps){
 									const computeFunctionName = splitFunctionThis[1].trim();
 									const args = splitArgsParenthis[0];
 									const splitArgs = args.split(',');
-									//const argList = splitArgs.map(s => s.replace('this.', '')).join();
 									const computedPropInfo : IComputedPropInfo = {
 										argList : splitArgs,
 										computedMethodName: computeFunctionName,
@@ -316,10 +310,10 @@ export function toProp(props?: IPropertyProps){
 
 export function generateTemplateAbstractSyntaxTree(templateFnString: string){
     const splitArrow = templateFnString.split('=>');
-    const parameterSide = splitArrow[0];
+    const parameterSide = splitArrow.shift();
     const parameterSideWithoutParenthesis = parameterSide.replace('(', '').replace(')', '');
     const parameterSideWithoutType = parameterSideWithoutParenthesis.split(':')[0].trim();
-    const functionBodySide = splitArrow[1].trim().substr(1);
+    const functionBodySide = splitArrow.join('=>').trim().substr(1);
 	const templateHTML = `<xsl:template match="${parameterSideWithoutType}">
         ${functionBodySide}
     </xsl:template>`;
@@ -343,11 +337,6 @@ function processRoot($node:  Cheerio, $: CheerioStatic){
 
 
 function populateTextNode(nodeElement:  CheerioElement, templateTokenPair: IPair, parent: CheerioElement, $: CheerioStatic){
-    
-    
-    //parent.children.length === 1 below -- check for string interpolation
-    //const $parent = $(parent);
-    //const innerText = $parent.text();
     const innerText = nodeElement['data'];
     const splitPair = splitPairs(innerText, templateTokenPair);
     if(splitPair.length > 1){
@@ -383,7 +372,9 @@ function processNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPa
         children.forEach(child => {
             processNodeElement(child, templateTokenPair, nodeElement, $);
         });
-    }
+    };
+    //const $nodeElement = $(nodeElement);
+    
     if(children.length !== 3) return processChildrenFn();
     const lastChild = children[2];
     if(lastChild.type !== 'text') return processChildrenFn();
@@ -394,8 +385,10 @@ function processNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPa
     const firstChild = children[0];
     if(firstChild.type !== 'text') return processChildrenFn();
     const firstChildText = firstChild['data'] as string;
+    console.log(firstChildText);
     const firstChildTextTrim = firstChildText.trim();
     const splitMap = firstChildTextTrim.split('.map(');
+    console.log(splitMap.length);
     if(splitMap.length !== 2) return processChildrenFn(); //TODO: deal with other cases
     const listPath0 = splitMap[0];
     const splitPath0 = listPath0.split('${');
@@ -403,12 +396,14 @@ function processNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPa
     if(splitPath0.length !== 2) return processChildrenFn();
     const pathWithoutHeadToken = removeHeadToken(splitPath0[1], '.');
     const loopPath = replaceAll( pathWithoutHeadToken, '.', '/');
+    const loopSignaure = splitMap[1].trim();
+    const loopVariable = loopSignaure.split('=>')[0].trim();
     //firstChild['data'] = '<hello>';
     //lastChild['data'] = '</hello>';
     const $nodeElement = $(nodeElement);
     const middleChild = children[1];
     processNodeElement(middleChild, templateTokenPair, nodeElement, $);
-    $nodeElement.html(`<xsl:for-each select="${loopPath}">` + $(middleChild).html() + '</xsl:for-each>');
+    $nodeElement.html(`<xsl:for-each select="${loopPath}"><xsl:variable name='${loopVariable}' select='.'/>` + $(middleChild).html() + '</xsl:for-each>');
     
 }
 
