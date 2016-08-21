@@ -5,6 +5,7 @@ import cheerio = require('cheerio');
 const __bt = '__@bt';
 export const WebComponentProps = 'WebComponentProps';
 export const ComputedRelationship = 'ComputedRelationship';
+const designTypeMetaKey = 'design:type';
 const getter = function(ID: string, defaultValue?: any){
     return function(){
         const lu = this[__bt];
@@ -54,7 +55,7 @@ export interface IComputedPropInfo{
 	argList: string[];
 }
 
-//#region
+//#region class reflection
 export interface IPair{
     lhs: string;
     rhs: string;
@@ -65,19 +66,199 @@ export interface INameValuePair{
     value: string;
 }
 
-export interface IPropertyInfo {
-    name: string;
-    propertyDescriptor: PropertyDescriptor;
+export interface IPropertyInfo extends IReflectionEntity {
+    //name?: string;
+    propertyDescriptor?: PropertyDescriptor;
     //metadata: {[key: string]: string};
-    metadata: INameValuePair[];
+    //metadata: INameValuePair[];
     type?: any;
 }
 
-export interface IMethodInfo{
-    name: string;
-    value: any;
-    functionStr: string;
+export class PropertyInfo implements IPropertyInfo{
+    constructor(public name: string, public propertyTypeClassRef: Function){}
+    private _propertyType;
+    public get propertyType(){
+        if(!this._propertyType){
+            this._propertyType = reflectClassPrototype(this.propertyTypeClassRef.prototype, true);
+        }
+        return this._propertyType;
+    }
+
 }
+
+export interface IMemberInfo extends IReflectionEntity{
+    propertyDescriptor ?: any;
+    isPublic?: boolean;
+}
+
+export interface IMethodArgument extends IReflectionEntity {
+    argumentType?:  IType;
+    argumentTypeClassRef?: any;
+}
+
+export class MethodArgument implements IMethodArgument{
+    constructor(public name: string, public argumentTypeClassRef: Function){}
+    private _argumentType : IType;
+    public get argumentType(){
+        if(!this._argumentType){
+            this._argumentType = reflectClassPrototype(this.argumentTypeClassRef.prototype, true);
+        }
+        return this._argumentType;
+    }
+}
+
+export interface IMethodInfo extends IMemberInfo{
+    value?: any;
+    functionStr?: string;
+    returnType?: IType;
+    returnTypeClassRef?: Function;
+    args?: IMethodArgument[];
+}
+
+export class MethodInfo implements IMethodInfo{
+    constructor(public name: string, public args: IMethodArgument[], public returnTypeClassRef?: Function){}
+    private _returnType: IType;	
+    public get returnType(){
+        if(!this._returnType){
+            this._returnType = reflectClassPrototype(this.returnTypeClassRef.prototype, true);
+        }
+        return this._returnType;
+    }	
+}
+
+export interface IReflectionEntity{
+    name?: string;
+    metadata?: {[key: string] : any;};
+}
+
+export interface IType extends IReflectionEntity{
+    properties?: IPropertyInfo[];
+    methods?: IMethodInfo[];
+    staticProperties?: IPropertyInfo[];
+    staticMethods?: IMethodInfo[];
+    
+}
+
+function reflectClassPrototype(classPrototype: any, recursive?: boolean) : IType{
+    let name : string = classPrototype.constructor.toString().substring(9);
+    const iPosOfOpenParen = name.indexOf('(');
+    name = name.substr(0, iPosOfOpenParen);
+    const returnType : IType = {
+        name: name
+    }
+    addMemberInfo(returnType, classPrototype, true, recursive);
+    return returnType;
+}
+
+export function processFACETSFileClass(className: string, facetsFile: any) : IType{
+    const classDef = facetsFile[className];
+    const classProto = classDef.prototype;
+    return reflectClassPrototype(classProto, true);
+}
+
+function getPropertyDescriptor(classPrototype: any, memberKey: string){
+    while(classPrototype){
+        const propertyDescriptor = Object.getOwnPropertyDescriptor(classPrototype, memberKey);
+        if(propertyDescriptor) return propertyDescriptor;
+        classPrototype = classPrototype.__proto__;
+    }
+    return null;
+    
+}
+
+export function createNew<InterfaceImplementorType, InterfaceType>(classRef: Function, obj: InterfaceType ){
+    const implObj = new (<any>classRef)();
+    Object.assign(implObj, obj);
+    return <InterfaceImplementorType> implObj;
+}
+    
+function addMemberInfo(returnType: IType, classRefOrClassPrototype: any, isPrototype: boolean, recursive?: boolean){
+    const memberNames = Object.getOwnPropertyNames(classRefOrClassPrototype);
+    for(const memberKey of memberNames){
+        const propertyDescriptor = getPropertyDescriptor(classRefOrClassPrototype, memberKey);
+        if(propertyDescriptor){
+            const memberInfo : IMemberInfo = {
+                name: memberKey,
+                propertyDescriptor : propertyDescriptor,
+            };
+            const metaDataKeys = Reflect.getMetadataKeys(classRefOrClassPrototype, memberKey);
+            for(let i = 0, n = metaDataKeys.length; i < n; i++){
+                const metaKey = metaDataKeys[i];
+                if(!memberInfo.metadata) memberInfo.metadata = {};
+                //debugger;
+                memberInfo.metadata[metaKey] = Reflect.getMetadata(metaKey, classRefOrClassPrototype, memberKey);
+            }
+            if(propertyDescriptor.value){
+                //#region method
+                //const methodInfo = <IMethodInfo> memberInfo;
+                const methodInfo = createNew<MethodInfo, IMemberInfo>(MethodInfo, memberInfo);
+                const methodSignature = propertyDescriptor.value.toString();
+                const signatureInsideParenthesis = substring_between(methodSignature, '(', ')');
+                if(!signatureInsideParenthesis){
+                    console.log('TODO: handle this scenario');
+                    continue;
+                }
+                const paramNames = signatureInsideParenthesis.split(',');
+                if(memberInfo.metadata){
+                    const paramTypes = memberInfo.metadata['design:paramtypes'];
+                    if(paramTypes.length > 0){
+                        if(paramNames.length !== paramTypes.length){
+                        throw `Discrepency found in method parameters for method:  ${memberKey}`;
+                        }
+                        methodInfo.args = [];
+                        methodInfo.returnTypeClassRef = memberInfo.metadata['design:returntype'];
+                        for(let i = 0, n = paramTypes.length; i < n; i++){
+                            const paramInfo = new MethodArgument(paramNames[i].trim(), paramTypes[i]);
+                            
+                            methodInfo.args.push(paramInfo);
+                        }
+                    }
+                }
+                
+                
+                // methodInfo.args = paramNames.map(arg => {
+                    
+                // 	return {
+                // 		name: arg.trim(),
+                // 	}
+                // });
+                if(isPrototype){
+                    if(!returnType.methods) returnType.methods = [];
+                    returnType.methods.push(methodInfo);
+                }else{
+                    if(!returnType.staticMethods) returnType.staticMethods = [];
+                    returnType.staticMethods.push(methodInfo);
+                }
+                
+                //#endregion
+            }else if(propertyDescriptor.get || propertyDescriptor.set){
+                //#region property
+                const propInfo = createNew<PropertyInfo, IMemberInfo>(PropertyInfo, memberInfo); 
+                
+                if(isPrototype){
+                    if(!returnType.properties) returnType.properties = [];
+                    returnType.properties.push(propInfo);
+                }else{
+                    if(!returnType.staticProperties) returnType.staticProperties = [];
+                    returnType.staticProperties.push(propInfo);
+                }
+                    if(recursive){
+                    const propertyType = Reflect.getMetadata(designTypeMetaKey, classRefOrClassPrototype, memberKey);
+                    propInfo.propertyTypeClassRef = propertyType;
+                // 	if(propertyType){
+                // 		propInfo.propertyType = reflectPrototype(propertyType.prototype, recursive);
+                // 	}
+                }
+                
+                //#endregion
+            }
+        }
+        
+    }
+}
+
+
+
 //#endregion
 
 export function toProp(props?: IPropertyProps){
@@ -134,8 +315,13 @@ export function toProp(props?: IPropertyProps){
 }
 
 export function generateTemplateAbstractSyntaxTree(templateFnString: string){
-	const templateHTML = `<xsl:template>
-        ${templateFnString}
+    const splitArrow = templateFnString.split('=>');
+    const parameterSide = splitArrow[0];
+    const parameterSideWithoutParenthesis = parameterSide.replace('(', '').replace(')', '');
+    const parameterSideWithoutType = parameterSideWithoutParenthesis.split(':')[0].trim();
+    const functionBodySide = splitArrow[1].trim().substr(1);
+	const templateHTML = `<xsl:template match="${parameterSideWithoutType}">
+        ${functionBodySide}
     </xsl:template>`;
     
 	const $ = cheerio.load(templateHTML);
@@ -316,4 +502,12 @@ function removeHeadToken(text: string, search: string){
     const iPos = text.indexOf(search);
     if(iPos == 1) return text;
     return text.substr(iPos + 1);
+}
+
+function substring_between(value: string, LHDelim: string, RHDelim: string){
+    const iPosOfLHDelim = value.indexOf(LHDelim);
+    if(iPosOfLHDelim === -1) return null;
+    const iPosOfRHDelim = value.indexOf(RHDelim);
+    if(iPosOfRHDelim === -1) return value.substring(iPosOfLHDelim + LHDelim.length);
+    return value.substring(iPosOfLHDelim + LHDelim.length, iPosOfRHDelim);
 }

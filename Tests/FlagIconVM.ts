@@ -28,9 +28,11 @@ class HTMLElement{
 }
 
 export class Designer{
+    
     constructor(public firstName: string, public lastName: string){
 
     }
+    
 }
 
 
