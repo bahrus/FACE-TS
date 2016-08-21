@@ -320,7 +320,7 @@ export function generateTemplateAbstractSyntaxTree(templateFnString: string){
     
 	const $ = cheerio.load(templateHTML);
 	processRoot($.root(), $);
-    return $.root();
+    return $;
 }
 
 function processRoot($node:  Cheerio, $: CheerioStatic){
@@ -385,10 +385,8 @@ function processNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPa
     const firstChild = children[0];
     if(firstChild.type !== 'text') return processChildrenFn();
     const firstChildText = firstChild['data'] as string;
-    console.log(firstChildText);
     const firstChildTextTrim = firstChildText.trim();
     const splitMap = firstChildTextTrim.split('.map(');
-    console.log(splitMap.length);
     if(splitMap.length !== 2) return processChildrenFn(); //TODO: deal with other cases
     const listPath0 = splitMap[0];
     const splitPath0 = listPath0.split('${');
@@ -403,7 +401,14 @@ function processNodeElement(nodeElement:  CheerioElement, templateTokenPair: IPa
     const $nodeElement = $(nodeElement);
     const middleChild = children[1];
     processNodeElement(middleChild, templateTokenPair, nodeElement, $);
-    $nodeElement.html(`<xsl:for-each select="${loopPath}"><xsl:variable name='${loopVariable}' select='.'/>` + $(middleChild).html() + '</xsl:for-each>');
+    //const middleChildHTML = '<' + middleChild.name + '>' + $(middleChild).html() + '</' + middleChild.name + '>'
+    const middleChildHTML = $.html(middleChild);
+    $nodeElement.html(`
+    <xsl:for-each select="${loopPath}">
+        <xsl:variable name='${loopVariable}' select='.'></xsl:variable>
+        ${middleChildHTML}
+    </xsl:for-each>
+`);
     
 }
 

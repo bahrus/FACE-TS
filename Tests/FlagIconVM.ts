@@ -19,7 +19,7 @@ export const FlagIconVMTemplate = (flag_icon: FlagIconVM) => `
     <div>NickNames:</div>
     <ul>
                                                         ${flag_icon.nickNames.map(nickName =>`
-        <li>NickName: ${nickName}</li>
+        <li style="background-color:red">NickName: ${nickName}</li>
                                                         `).join('')}                                                                        
     </ul>
 `;

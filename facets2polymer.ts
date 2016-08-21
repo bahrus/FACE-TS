@@ -40,11 +40,27 @@ const outputFilePath = resolvedFilePath + '.html';
 
 fs.writeFileSync(outputFilePath, outputS, {encoding: 'utf8'});
 
-function performHTMLTransformToPolymerFormat(astForView:  Cheerio){
+function performHTMLTransformToPolymerFormat($: CheerioStatic){
+    const astForView = $.root();
     const rootTemplate = astForView.children('xsl\\:template');
     const matchParam = rootTemplate.attr('match');
     const valueOfs = rootTemplate.find('xsl\\:value-of');
-    
+    valueOfs.each((idx, valueOf) =>{
+        const $valueOf = $(valueOf);
+        const select = $valueOf.attr('select');
+        $valueOf.replaceWith('{{' + select + '}}');
+    });
+    const forEachs = rootTemplate.find('xsl\\:for-each');
+    forEachs.each((idx, forEach) =>{
+        const $forEach = $(forEach);
+        const $variableNameElement = $forEach.children('xsl\\:variable');
+        const $repeatingElement = $variableNameElement.next();
+        debugger;
+        $repeatingElement.attr('dom-forEach', 'iah');
+        $variableNameElement.remove();
+        
+        $forEach.replaceWith($forEach.html());
+    })
     const outputTemplate = `
     <dom id='${matchParam}'>
     <template>
@@ -52,10 +68,7 @@ function performHTMLTransformToPolymerFormat(astForView:  Cheerio){
     </dom>
     `;
     console.log(outputTemplate);
-    //const 
-    //debugger;
-    //console.log('match = ' + match);
-    //const outPut = 
+    
 }
 
 
