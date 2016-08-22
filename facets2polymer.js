@@ -18,9 +18,9 @@ function processFACETSFileTemplate(filePath) {
     const templateName = fileName + "Template";
     const templateFnString = facetsFile[templateName].toString();
     const astForView = bt.generateTemplateAbstractSyntaxTree(templateFnString);
-    performHTMLTransformToPolymerFormat(astForView);
-    const test2 = astForView.html();
-    console.log(test2);
+    const templateString = performHTMLTransformToPolymerFormat(astForView);
+    // const test2 = astForView.html(); 
+    // console.log(test2);
     const result = bt.processFACETSFileClass(fileName, facetsFile);
 }
 const outputS = processFACETSFileTemplate(filePath);
@@ -40,19 +40,26 @@ function performHTMLTransformToPolymerFormat($) {
     const forEachs = rootTemplate.find('xsl\\:for-each');
     forEachs.each((idx, forEach) => {
         const $forEach = $(forEach);
+        const select = $forEach.attr('select');
         const $variableNameElement = $forEach.children('xsl\\:variable');
-        const $repeatingElement = $variableNameElement.next();
-        debugger;
-        $repeatingElement.attr('dom-forEach', 'iah');
+        const name = $variableNameElement.attr('name');
+        //const $repeatingElement = $variableNameElement.next();
+        //$repeatingElement.attr('is', '');
         $variableNameElement.remove();
-        $forEach.replaceWith($forEach.html());
+        const innerHTML = $forEach.html();
+        $forEach.replaceWith(`<template is="dom-repeat" items="{{${select}}}" as="${name}">
+            ${innerHTML}
+        </template>
+        `);
     });
     const outputTemplate = `
     <dom id='${matchParam}'>
     <template>
+    ${rootTemplate.html()}
     </template>
     </dom>
     `;
     console.log(outputTemplate);
+    return outputTemplate;
 }
 //# sourceMappingURL=facets2polymer.js.map
