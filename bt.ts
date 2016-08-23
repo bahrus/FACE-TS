@@ -140,9 +140,11 @@ export interface IType extends IReflectionEntity{
 }
 
 function reflectClassPrototype(classPrototype: any, recursive?: boolean) : IType{
-    let name : string = classPrototype.constructor.toString().substring(9);
-    const iPosOfOpenParen = name.indexOf('(');
+    let name : string = classPrototype.constructor.toString().replace('class ', '').trim();
+    const iPosOfOpenParen = name.indexOf('{');
     name = name.substr(0, iPosOfOpenParen);
+    const splitName = name.split(' ');
+    name = splitName[0];
     const returnType : IType = {
         name: name
     }
