@@ -1,0 +1,26 @@
+{
+  "sessions": [
+    {
+      "id": "36603d3e-126e-40c5-a49d-6b1e0e82c958",
+      "tabLayout": {
+        "type": "stack",
+        "width": 100,
+        "height": 100,
+        "tabs": [
+          {
+            "id": "f7e6e466-f4f3-418a-b163-e59e86d7bd20",
+            "relativeUrl": "file://./Tests/FlagIconVM.ts",
+            "additionalData": null
+          }
+        ],
+        "subItems": [],
+        "activeItemIndex": 0
+      },
+      "lastUsed": 1472526006845,
+      "fileTreeExpanded": true,
+      "fileTreeWidth": 453,
+      "selectedTabId": "f7e6e466-f4f3-418a-b163-e59e86d7bd20"
+    }
+  ],
+  "relativePathToTsconfig": "./tsconfig.json"
+}

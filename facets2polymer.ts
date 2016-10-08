@@ -134,51 +134,69 @@ function StringBuilder(){
 	};
 };
 
+function toJSObject(val: any){
+    let JSVal;
+    switch(typeof(val)){
+        case 'string':
+            JSVal = "'" + val + "'";
+            break;
+        default:
+            JSVal = val;
+    }
+    return JSVal;
+}
+
 function generatePolymerClassDefition(classReflection: bt.IType){
     let result = new StringBuilder();
-    result.appendLine(`
-        properties: {`)
-    let counter = 0;
+    result.appendLine(`properties: {`)
+    //let counter = 0;
     let propLen = classReflection.properties.length;
-    classReflection.properties.forEach(property =>{
-        result.appendLine('\t\t' + property.name + ':{');
+    classReflection.properties.forEach((property, idx) =>{
+        result.appendLine(property.name + ':{');
             if(property.metadata){
                 let type = property.metadata['design:type'].toString();
                 if(type){
                     const splitFunction = type.split(' ');
                     type = splitFunction[1].replace('(', '').replace(')', '');
-                    result.appendLine('\t\t\ttype: ' + type);
+                    result.appendLine('type: ' + type);
                 }
                 const wcp = property.metadata['WebComponentProps'] as bt.IPropertyProps;
                 if(wcp){
                     if(typeof(wcp.defaultValue) !== 'undefined'){
-                        let defaultValue;
-                        switch(typeof(wcp.defaultValue)){
-                            case 'string':
-                                defaultValue = "'" + wcp.defaultValue + "'";
-                                break;
-                            default:
-                                defaultValue = wcp.defaultValue;
+                        result.appendLine('value: ' + toJSObject(wcp.defaultValue));
+                    }
+                    for(const key in wcp){
+                        if(key.startsWith('polymer_')){
+                            const polymerKey = key.substring(8);
+                            result.appendLine(polymerKey + ':' + toJSObject( wcp[key]));
                         }
-                        result.appendLine('\t\t\tvalue: ' + defaultValue);
                     }
                 }
                 
             }
-        counter++;
-        if(counter < propLen){
-            result.appendLine('\t\t},');
+        //counter++;
+        if(idx < propLen - 1){
+            result.appendLine('},');
         }else{
-            result.appendLine('\t\t}');
+            result.appendLine('}');
         }
         //result.appendLine('');
     })
-    result.appendLine('\t\t}');
-    // let result = `
-    //     properties:{
-    //         ${JSON.stringify(polymerProperties)}
-    //     }
-    // `;
+    result.appendLine('}');
+    if(classReflection.methods || classReflection.staticMethods){
+        result.append(',')
+        if(classReflection.methods){
+            const methodLength = classReflection.methods.length;
+            classReflection.methods.forEach((method, idx) => {
+                const paramNames = method.args.map(arg => arg.name);
+                result.appendLine(method.name + ': function(' + paramNames.join(',') + ')');
+                result.append(method.methodBody);
+                if(idx < methodLength - 1){
+                    result.append(',');
+                }
+            });
+        }
+    }
     
     return result.toString();
 }

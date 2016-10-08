@@ -113,6 +113,7 @@ export interface IMethodInfo extends IMemberInfo{
     returnType?: IType;
     returnTypeClassRef?: Function;
     args?: IMethodArgument[];
+    methodBody?: string;
 }
 
 export class MethodInfo implements IMethodInfo{
@@ -123,7 +124,8 @@ export class MethodInfo implements IMethodInfo{
             this._returnType = reflectClassPrototype(this.returnTypeClassRef.prototype, true);
         }
         return this._returnType;
-    }	
+    }
+    methodBody: string;	
 }
 
 export interface IReflectionEntity{
@@ -193,7 +195,7 @@ function addMemberInfo(returnType: IType, classRefOrClassPrototype: any, isProto
             if(propertyDescriptor.value){
                 //#region method
                 //const methodInfo = <IMethodInfo> memberInfo;
-                const methodInfo = createNew<MethodInfo, IMemberInfo>(MethodInfo, memberInfo);
+                const methodInfo = createNew<MethodInfo, IMethodInfo>(MethodInfo, memberInfo);
                 const methodSignature = propertyDescriptor.value.toString();
                 const signatureInsideParenthesis = substring_between(methodSignature, '(', ')');
                 if(!signatureInsideParenthesis){
@@ -215,9 +217,17 @@ function addMemberInfo(returnType: IType, classRefOrClassPrototype: any, isProto
                             methodInfo.args.push(paramInfo);
                         }
                     }
+                }else{
+                    methodInfo.args = [];
+                    for(var paramName of paramNames){
+                        const paramInfo : IMethodArgument = {
+                            name: paramName,
+                        };
+                        methodInfo.args.push(paramInfo);
+                    }
                 }
-                
-                
+                const methodBody = substring_after( methodSignature, ')');
+                methodInfo.methodBody = methodBody;
             
                 if(isPrototype){
                     if(!returnType.methods) returnType.methods = [];
@@ -512,4 +522,10 @@ function substring_between(value: string, LHDelim: string, RHDelim: string){
     const iPosOfRHDelim = value.indexOf(RHDelim);
     if(iPosOfRHDelim === -1) return value.substring(iPosOfLHDelim + LHDelim.length);
     return value.substring(iPosOfLHDelim + LHDelim.length, iPosOfRHDelim);
+}
+
+function substring_after(value: string, after: string){
+    const iPosOfAfter = value.indexOf(after);
+    if(iPosOfAfter === -1) return null;
+    return value.substr(iPosOfAfter + after.length);
 }
