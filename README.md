@@ -2,8 +2,8 @@
 
 ## What does FACETS stand for?
 
-1)  **F**ramework **A**gnostic **C**ustom **E**lement **T**emplates
-2)  **F**aces in **T**ypescript
+1\)  **F**ramework **A**gnostic **C**ustom **E**lement **T**emplates
+2\)  **F**aces in **T**ypescript
 
 [The v1 Custom Element specs](https://www.w3.org/TR/custom-elements/#custom-elements-autonomous-example) 
 provides a rudimentary example of how to create a custom element:
@@ -42,47 +42,35 @@ class FlagIcon extends HTMLElement {
 }
 ```
 
-As indicated in the updateRendering method comment, there is very little indication 
-in the custom element specs regarding *how* you should design your component, 
-as far as rendering and interacting with the user.  Should you make use of 
-dependency-free raw platform api's? JQuery? D3? React/JSX? Elm? WebAssembly?  
-A template engine with two-way binding?  Some other solution not yet dreamt of? 
-We already have seen different ergonomic layers arise, including Polymer, X-tags, 
+As indicated in the updateRendering method comment, there is very little indication in the custom element specs regarding _how_ you should design your component, as far as rendering and interacting with the user.  Should you make use of dependency-free raw platform api's? JQuery? D3? React\/JSX? Elm? WebAssembly?  A template engine with two-way binding?  Some other solution not yet dreamt of? ,We already have seen different ergonomic layers arise, including Polymer, X-tags, 
 Bosonic, and SkateJS, which adhere to different paradigms.  Aurelia might be considered 
 another one, though Aurelia's scope is much broader.  Many more, no doubt, will surface.
 
 In addition to libraries that support defining W3C compliant custom elements, there are additional
-libraries that support their own proprietary way of defining components.  Examples are angular 2,
-aurelia, ember, vue.js, react, and many more.
+quite popular component based libraries \/ frameworks, that support their own proprietary way of defining components.  Examples are Angular 2, Aurelia, Ember, vue.js, React, just to name a few..  
 
-The idea of different teams of component developers choosing whatever ergonomic layer
- (+ other dependencies) they desire, and to be able to have all the components working 
- together in perfect harmony, is a big draw for the web component technology. But it 
- comes with a cost.  If each component on a page has its own ergonomic library (or its own proprietary
- rich framework behind it), that's 
- potentially a significant amount of code overhead just from those 
- different ergonomic layers.  For many of those components, the developers may be 
- ambivalent which ergonomic layer is the best, and just want to get the job done.  
+The idea of different teams of component developers choosing whatever ergonomic layer \(+ other dependencies\) they desire, and to be able to have all the components working together in perfect harmony, is a big draw for the web component technology. But it comes with a cost.  If each component on a page has its own ergonomic library \(or its own proprietary rich framework behind it\), that's potentially a significant amount of code overhead just from those different ergonomic layers.  For many of those components, the developers may be ambivalent which ergonomic layer is the best, and just want to get the job done.  
  If one application tends to use primarily Polymer, it would be nice if the component 
  could utilize it if is present.  If Aurelia, the same component could leverage it. Some web component 
  ergonomic layers, like SkateJS, explicitly suggest they can be a "compilation" target, especially 
- when defining the visual template representation. 
+ when defining the visual template representation.
 
-Each of these component ergonomic layer and/or component framework utilizes its own rocket-science 
+Each of these component ergonomic layers and\/or component frameworks utilizes its own rocket-science 
 in terms of how to achieve the best performing results.  Wouldn't it be nice if the same component definition 
-could be used for either?  That's what FACETS is designed to help with.
+could be used, but could target any or all of the approaches?  That's what FACETS is designed to help with.
 
 Specifically, FACETS is a file format meant to accomplish the following goals:
 
 * The generic requirement:  Be as generic as possible, adhering to syntax that will 
-survive for years to come.  Avoid rendering specifics or playing favorites with any 
-of the template driven frameworks.
+  survive for years to come.  Avoid rendering specifics or playing favorites with any 
+  of the component based frameworks.
 * Be flexible enough that as much of the unique feature set of each framework can be 
-tapped into as possible.
+  tapped into as possible.
 * Leverage TypeScript to allow compile-time checks and intellisense on the templates
- (no need for IDE plug-ins to understand proprietary attributes).
+  \(no need for IDE plug-ins to understand proprietary attributes\).
 
 The file format.  Here is an example of a FACETS component definition:
+
 ```typescript
 const FlagIconTemplate = (flag_icon: FlagIcon) => `
     <div>
@@ -100,8 +88,8 @@ const FlagIconTemplate = (flag_icon: FlagIcon) => `
 class FlagIcon extends HTMLElement {
 
     nickNames: string[];
-    
-    
+
+
     private _countryCode: string;
 
     private _countryCodeToImgUrlLookup: {[key: string] : string};
@@ -139,9 +127,9 @@ class FlagIcon extends HTMLElement {
     }
 
 
-    
 
-    
+
+
 
 }
 ```
@@ -175,11 +163,9 @@ And likewise the aurelia processor would output:
 <div some-other-property="goodbye"></div>
 ```
 
-Likewise with properties / methods of a class.  If a method called polymer_doSomething 
-and another method aurelia_doSomething is defined, both the polymer and aurelia target
+Likewise with properties \/ methods of a class.  If a method called polymer\_doSomething 
+and another method aurelia\_doSomething is defined, both the polymer and aurelia target
 transpiled will have one implementation of a method called doSomething.  The transpiler
 will also erase any plaeholder method called doSomething, which would be there in order for
-references to be made, ina 
-
-
+references to be made, ina
 
