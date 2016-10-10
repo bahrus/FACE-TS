@@ -70,7 +70,7 @@ function performHTMLTransformToPolymerFormat($: CheerioStatic, classDef: string)
     });
     
     const outputTemplate = `
-    <dom-module id='${matchParam}'>
+<dom-module id='${matchParam}'>
     <template>
     ${rootTemplate.html()}
     </template>
@@ -80,7 +80,7 @@ function performHTMLTransformToPolymerFormat($: CheerioStatic, classDef: string)
             ${classDef}
         });
     </script>
-    </dom-module>
+</dom-module>
     `;
     console.log(outputTemplate);
     return outputTemplate;

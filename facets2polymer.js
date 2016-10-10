@@ -54,7 +54,7 @@ function performHTMLTransformToPolymerFormat($, classDef) {
         `);
     });
     const outputTemplate = `
-    <dom-module id='${matchParam}'>
+<dom-module id='${matchParam}'>
     <template>
     ${rootTemplate.html()}
     </template>
@@ -64,7 +64,7 @@ function performHTMLTransformToPolymerFormat($, classDef) {
             ${classDef}
         });
     </script>
-    </dom-module>
+</dom-module>
     `;
     console.log(outputTemplate);
     return outputTemplate;

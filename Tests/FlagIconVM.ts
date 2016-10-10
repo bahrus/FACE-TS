@@ -7,9 +7,7 @@ import bt = require('../bt');
 import rt = require('../rt');
 
 const country_change_handler = 'country_change_handler';
-const test = Symbol();
 
-//const test = 'test';
 export const FlagIconVMTemplate = (flag_icon: FlagIconVM) => `
     <div>
         <img src="${flag_icon.countryCodeImgUrl}" 
